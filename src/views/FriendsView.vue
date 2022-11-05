@@ -1,5 +1,4 @@
 <script setup>
-import CentralAdd from "@/components/CentralAdd.vue"
 import FriendEntry from "@/components/FriendEntry.vue"
 import FriendDialog from "@/fragments/FriendDialog.vue"
 import { ref } from "vue"
@@ -9,8 +8,8 @@ const friendsStore = useFriendsStore()
 
 const frienddialog = ref(null)
 
-const openFriendDialog = (id) => {
-  frienddialog.value.open(id)
+const openFriendDialog = (id, guest = false) => {
+  frienddialog.value.open(id, guest)
 }
 </script>
 
@@ -23,10 +22,15 @@ const openFriendDialog = (id) => {
         :name="friend.displayName"
         :guest="friend.isGuest"
         :alias="friend.alias"
-        @click="openFriendDialog(id)"
+        @click="openFriendDialog(id, friend.isGuest)"
       />
 
-      <CentralAdd @click="openFriendDialog()" />
+      <div class="actions">
+        <button type="button" @click="openFriendDialog()">Add Friend 😊</button>
+        <button type="button" @click="openFriendDialog(undefined, true)">
+          Add Guest 🤖
+        </button>
+      </div>
 
       <p
         class="no-more-entries"
@@ -54,6 +58,27 @@ const openFriendDialog = (id) => {
     gap: 10px;
     grid-gap: 10px;
     padding: 15px 10px;
+  }
+
+  .actions {
+    position: fixed;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    button {
+      width: auto;
+      display: flex;
+      align-items: center;
+
+      svg {
+        margin-right: 0.5rem;
+      }
+    }
   }
 
   .no-more-entries {

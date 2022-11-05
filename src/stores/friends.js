@@ -8,7 +8,8 @@ import {
   deleteDoc,
   where,
   getDocs,
-  setDoc
+  setDoc,
+  addDoc
 } from "firebase/firestore"
 import { db } from "../util/firebase"
 import { useAuthStore } from "./auth"
@@ -54,6 +55,12 @@ export const useFriendsStore = defineStore({
     async create(id, data) {
       await setDoc(
         doc(db, "users", this.authStore.user.uid, "friends", id),
+        data
+      )
+    },
+    async add(data) {
+      await addDoc(
+        collection(db, "users", this.authStore.user.uid, "friends"),
         data
       )
     },

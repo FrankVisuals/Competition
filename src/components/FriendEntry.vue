@@ -20,13 +20,14 @@ const props = defineProps({
     <div class="left">
       <span class="friend-alias"
         >{{ props.alias || props.name }}
-        <span class="friend-title" v-if="props.alias"
-          >({{ props.name }})</span
+        <span class="friend-title" v-if="props.alias || props.guest"
+          >({{ props.guest ? "Guest" : props.name }})</span
         ></span
       >
     </div>
     <div class="right">
       <span class="friend-guest" v-if="props.guest">🤖</span>
+      <span class="friend-guest" v-if="!props.guest">😊</span>
     </div>
   </div>
 </template>
