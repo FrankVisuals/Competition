@@ -42,23 +42,40 @@ const dialogTitle = computed(() => {
 
 const onSave = async () => {
   if (friend.id) {
-    await friendsStore.update(friend.id, friend.data)
+    await busy.load(async () => {
+      await friendsStore.update(friend.id, friend.data)
+      bus.emit("info", `"${friend.data.displayName}" was updated`)
+    })
+
+    dialog.close()
   } else {
-    const users = await friendsStore.find(friend.search)
-    const [user] = users.docs
+    await busy.load(async () => {
+      const users = await friendsStore.find(friend.search)
+      const [user] = users.docs
 
-    if (!user) {
-      bus.emit("error", `User with email "${friend.search}" not found`)
-      return
-    }
+      if (!user) {
+        bus.emit("error", `User with email "${friend.search}" not found`)
+        return
+      }
 
-    await friendsStore.create(user.id, {
-      isGuest: false,
-      displayName: user.data().displayName,
-      alias: null
+      if (friendsStore.friends[user.id]) {
+        bus.emit(
+          "error",
+          `User with email "${friend.search}" is already a friend`
+        )
+        return
+      }
+
+      await friendsStore.create(user.id, {
+        isGuest: false,
+        displayName: user.data().displayName,
+        alias: null
+      })
+
+      bus.emit("info", `"${user.data().displayName}" was added`)
+      dialog.close()
     })
   }
-  dialog.close()
 }
 
 const onDelete = async () => {
@@ -67,7 +84,9 @@ const onDelete = async () => {
     message:
       "Are you sure? If you delete this friend, you can no longer track data / competitions with him.",
     callback: async () => {
-      await friendsStore.delete(friend.id)
+      await busy.load(async () => {
+        await friendsStore.delete(friend.id)
+      })
       dialog.close()
     }
   })
@@ -130,99 +149,6 @@ const onDelete = async () => {
 </template>
 
 <style lang="less" scoped>
-.dialog {
-  transform: translateY(100%);
-  background: transparent;
-  transition: background 0.15s ease;
-
-  width: 100%;
-  height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 5;
-}
-
-.dialog-content {
-  transform: translateY(100%);
-  transition: transform 0.15s ease;
-
-  width: 100%;
-  background: var(--color-background);
-  height: ~"calc(100% - 2rem)";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 1rem;
-
-  h2 {
-    line-height: 1;
-  }
-}
-
-.close {
-  width: auto;
-}
-
-.open {
-  &.dialog {
-    transform: translateY(0);
-    background: rgba(0, 0, 0, 0.4);
-  }
-
-  .dialog-content {
-    transform: translateY(0);
-  }
-}
-
-&.closing {
-  &.dialog {
-    background: rgba(0, 0, 0, 0);
-  }
-
-  .dialog-content {
-    transform: translateY(100%);
-  }
-}
-
-form {
-  height: ~"calc(100% - 69px)";
-  overflow-y: auto;
-  padding-bottom: 8rem;
-
-  .input + .input {
-    margin-top: 1rem;
-  }
-}
-
-footer {
-  position: absolute;
-  padding: 1rem;
-  bottom: 0;
-  width: 100%;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  button:not(.negative) {
-    background: var(--color-accent);
-    color: var(--color-background);
-  }
-
-  .negative {
-    width: auto;
-    margin-right: 1rem;
-    flex-shrink: 0;
-  }
-}
+@import "../styles/util";
+.dialog();
 </style>
