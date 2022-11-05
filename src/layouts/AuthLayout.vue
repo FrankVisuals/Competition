@@ -3,17 +3,27 @@ import { RouterLink, RouterView } from "vue-router"
 import DashboardIcon from "@/icons/dashboard-icon.vue"
 import TracksIcon from "@/icons/tracks-icon.vue"
 import Profile from "@/icons/profile-icon.vue"
+import Friends from "@/icons/friends-icon.vue"
 
 import { useCompetitionsStore } from "../stores/competitions"
-import { onMounted } from "vue-demi"
+import { watch } from "vue"
 import { useAuthStore } from "../stores/auth"
+import { useFriendsStore } from "../stores/friends"
 
-const competitionsStore = useCompetitionsStore()
 const authStore = useAuthStore()
+const competitionsStore = useCompetitionsStore()
+const friendsStore = useFriendsStore()
 
-onMounted(() => {
-  competitionsStore.reload()
-})
+watch(
+  () => authStore.isUserLoaded,
+  (value) => {
+    if (value) {
+      competitionsStore.initialize()
+      friendsStore.initialize()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -23,6 +33,7 @@ onMounted(() => {
   <footer id="main-navigation">
     <RouterLink :to="{ name: 'dashboard' }"><DashboardIcon /></RouterLink>
     <RouterLink :to="{ name: 'competitions' }"><TracksIcon /></RouterLink>
+    <RouterLink :to="{ name: 'friends' }"><Friends /></RouterLink>
     <RouterLink :to="{ name: 'profile' }"><Profile /></RouterLink>
   </footer>
 </template>

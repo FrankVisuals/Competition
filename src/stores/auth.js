@@ -2,8 +2,13 @@ import { defineStore } from "pinia"
 import {
   createUserWithEmailAndPassword,
   deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  updatePassword,
+  updateProfile
 } from "firebase/auth"
 import { auth } from "../util/firebase"
 
@@ -58,6 +63,21 @@ export const useAuthStore = defineStore({
     async delete() {
       await deleteUser(this.user)
       this.user = null
+    },
+    async updateUser(data) {
+      await updateProfile(this.user, data)
+
+      Object.keys(data).forEach((key) => {
+        this.user[key] = data[key]
+      })
+    },
+    async resetPassword(email) {
+      await sendPasswordResetEmail(auth, email)
+    },
+    async changePassword(current, updated) {
+      const credential = EmailAuthProvider.credential(this.user.email, current)
+      await reauthenticateWithCredential(this.user, credential)
+      await updatePassword(this.user, updated)
     }
   }
 })

@@ -1,34 +1,37 @@
 <script setup>
 import CentralAdd from "@/components/CentralAdd.vue"
-import TrackEntry from "@/components/TrackEntry.vue"
+import CompetitionEntry from "@/components/CompetitionEntry.vue"
 import CompetitionDialog from "@/fragments/CompetitionDialog.vue"
 import { ref } from "vue"
+import { useAuthStore } from "../stores/auth"
 import { useCompetitionsStore } from "../stores/competitions"
 
 const competitionsStore = useCompetitionsStore()
+const authStore = useAuthStore()
 
 const competitiondialog = ref(null)
 
-const openCompetitionDialog = () => {
-  competitiondialog.value.open()
+const openCompetitionDialog = (id) => {
+  competitiondialog.value.open(id)
 }
 </script>
 
 <template>
   <div class="view competitions">
     <div class="list">
-      <TrackEntry
-        v-for="(competition, i) in competitionsStore.competitions"
-        :key="i"
+      <CompetitionEntry
+        v-for="(competition, id) in competitionsStore.competitions"
+        :key="id"
         :name="competition.name"
-        :count="0"
+        :yours="competition.owner === authStore.user.uid"
+        @click="openCompetitionDialog(id)"
       />
 
       <CentralAdd @click="openCompetitionDialog" />
 
       <p
         class="no-more-entries"
-        v-if="competitionsStore.competitions.length > 0"
+        v-if="Object.keys(competitionsStore.competitions).length > 0"
       >
         No more data.
       </p>

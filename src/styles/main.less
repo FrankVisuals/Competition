@@ -41,12 +41,20 @@ button {
     border: none;
     background: none;
   }
+
+  &[disabled] {
+    opacity: 0.76;
+  }
 }
 
 input[type="text"] {
   padding: 5px 10px;
   border-radius: 0;
   border: 1px solid var(--color-border);
+
+  &[disabled] {
+    opacity: 0.76;
+  }
 }
 
 span.positive {

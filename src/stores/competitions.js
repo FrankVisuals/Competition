@@ -1,8 +1,15 @@
 import { defineStore } from "pinia"
+import {
+  addDoc,
+  query,
+  where,
+  collection,
+  onSnapshot,
+  updateDoc,
+  doc
+} from "firebase/firestore"
 import { db } from "../util/firebase"
-import { doc, setDoc } from "firebase/firestore"
-
-import { collection, onSnapshot } from "firebase/firestore"
+import { useAuthStore } from "./auth"
 
 export const useCompetitionsStore = defineStore({
   id: "competitions",
@@ -11,29 +18,54 @@ export const useCompetitionsStore = defineStore({
     defaultCompetition: {
       name: null,
       has_teams: false,
-      has_points: false
+      has_points: false,
+      highest_points_win: true,
+      owner: null,
+      members: []
     },
-    subscription: null
+    subscription: null,
+    authStore: null
   }),
   actions: {
-    async reload() {
-      if (!this.subscription) {
-        this.subscription = onSnapshot(
-          collection(db, "competitions"),
-          (snapshot) => {
-            this.competitions = []
-            snapshot.forEach((doc) => {
-              this.competitions.push(doc.data())
-            })
-          },
-          (error) => {
-            console.error(error)
-          }
-        )
+    async initialize() {
+      if (this.subscription) {
+        return
       }
+
+      this.authStore = useAuthStore()
+
+      this.subscription = onSnapshot(
+        query(
+          collection(db, "competitions"),
+          where("members", "array-contains", this.authStore.user.uid)
+        ),
+        (snapshot) => {
+          this.competitions = {}
+          snapshot.forEach((doc) => {
+            this.competitions[doc.id] = doc.data()
+          })
+        },
+        (error) => {
+          console.error(error)
+        }
+      )
     },
     async create(data) {
-      await setDoc(doc(db, "competitions"), data)
+      await addDoc(collection(db, "competitions"), {
+        ...data,
+        owner: this.authStore.user.uid,
+        members: [this.authStore.user.uid]
+      })
+    },
+    async update(id, data) {
+      await updateDoc(doc(db, "competitions", id), data)
+    },
+    async delete(id, { members }) {
+      // no real deletion, but removing the owner
+      await updateDoc(doc(db, "competitions", id), {
+        owner: null,
+        members: members.filter((m) => m !== this.authStore.user.uid)
+      })
     }
   }
 })
