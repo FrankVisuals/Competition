@@ -6,7 +6,6 @@ import SelectField from "@/components/SelectField.vue"
 import ToggleIconField from "@/components/ToggleIconField.vue"
 import AwardIcon from "@/icons/award-icon.vue"
 import AwardIconFilled from "@/icons/award-icon-filled.vue"
-import InfoBanner from "@/components/InfoBanner.vue"
 import { useBusy } from "@/components/composables/busy"
 import { useAuthStore } from "../stores/auth"
 import { useCompetitionsStore } from "../stores/competitions"
@@ -23,22 +22,14 @@ const friendsStore = useFriendsStore()
 const tracksStore = useTracksStore()
 
 const track = reactive({
-  id: null,
   competition: null,
   teams: []
 })
 
 defineExpose({
-  open: (id, t) => {
-    track.id = null
+  open: () => {
     track.competition = null
     track.teams = []
-
-    if (id) {
-      track.id = id
-      track.competition = t.competition
-      track.teams = JSON.parse(JSON.stringify(t.teams))
-    }
 
     dialog.open()
   }
@@ -65,7 +56,7 @@ const teamFactory = (initial, hasTeams) => {
 watch(
   () => track.competition,
   (newValue, oldValue) => {
-    if (!newValue || track.id) {
+    if (!newValue) {
       return
     }
 
@@ -143,20 +134,6 @@ const selectableCleaned = (current) => {
       return entry.key !== undefined
     })
 }
-
-const onDelete = () => {
-  bus.emit("delete", {
-    title: "Delete Track",
-    message:
-      "Do you really want to delete the track? This action cannot be undone.",
-    callback: async () => {
-      await busy.load(async () => {
-        await tracksStore.delete(track.id)
-        dialog.close()
-      })
-    }
-  })
-}
 </script>
 
 <template>
@@ -170,8 +147,7 @@ const onDelete = () => {
   >
     <div class="dialog-content">
       <header>
-        <h2 v-if="track.id">Edit Track</h2>
-        <h2 v-else>Add Track</h2>
+        <h2>Add Track</h2>
         <button :disabled="busy.isBusy" class="close" @click="dialog.close">
           Close
         </button>
@@ -181,7 +157,7 @@ const onDelete = () => {
         <SelectField
           placeholder="Competition"
           v-model="track.competition"
-          :busy="busy.isBusy || !!track.id"
+          :busy="busy.isBusy"
           icon="⚔️"
           :options="competitionsStore.selectable"
         />
@@ -240,24 +216,9 @@ const onDelete = () => {
             Add Team
           </button>
         </div>
-
-        <div class="info-banner-wrap">
-          <InfoBanner title="Editing Tracks" v-if="track.id">
-            You cannot edit existing tracks. You can only delete them in order
-            to recreate them.
-          </InfoBanner>
-        </div>
       </form>
 
       <footer>
-        <button
-          v-if="track.id"
-          :disabled="busy.isBusy"
-          @click="onDelete"
-          class="negative"
-        >
-          Delete
-        </button>
         <button :disabled="busy.isBusy" @click="onAdd">Add</button>
       </footer>
     </div>

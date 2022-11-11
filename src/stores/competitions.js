@@ -27,7 +27,7 @@ export const useCompetitionsStore = defineStore({
     authStore: null
   }),
   getters: {
-    selectable: (state) => {
+    selectable(state) {
       return Object.entries(state.competitions).map(([id, competition]) => {
         return {
           key: id,

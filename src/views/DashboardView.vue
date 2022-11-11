@@ -2,12 +2,18 @@
 import CentralAdd from "@/components/CentralAdd.vue"
 import TrackEntry from "@/components/TrackEntry.vue"
 import TrackDialog from "@/fragments/TrackDialog.vue"
+import ViewTrackDialog from "@/fragments/ViewTrackDialog.vue"
 import { ref } from "vue"
 import { useTracksStore } from "../stores/tracks"
 
 const trackDialog = ref(null)
-const openTrackDialog = (id, track) => {
-  trackDialog.value.open(id, track)
+const openTrackDialog = () => {
+  trackDialog.value.open()
+}
+
+const viewTrackDialog = ref(null)
+const openViewTrackDialog = (id, track) => {
+  viewTrackDialog.value.open(id, track)
 }
 
 const tracksStore = useTracksStore()
@@ -22,7 +28,7 @@ const tracksStore = useTracksStore()
           v-for="(track, key) in tracksStore.recentTracks"
           :key="key"
           :track="track"
-          @click="openTrackDialog(key, track)"
+          @click="openViewTrackDialog(key, track)"
         />
       </div>
     </section>
@@ -35,6 +41,7 @@ const tracksStore = useTracksStore()
   </div>
 
   <TrackDialog ref="trackDialog" />
+  <ViewTrackDialog ref="viewTrackDialog" />
 </template>
 
 <style lang="less" scoped>

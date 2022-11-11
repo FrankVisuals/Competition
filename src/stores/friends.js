@@ -27,6 +27,21 @@ export const useFriendsStore = defineStore({
     authStore: null
   }),
   getters: {
+    getUserName(state) {
+      return (id) => {
+        if (state.authStore.firebase.uid === id) {
+          return state.authStore.user.displayName
+        }
+
+        const friend = state.friends[id]
+
+        if (friend) {
+          return friend.displayName
+        }
+
+        return "unknown"
+      }
+    },
     selectable: (state) => {
       return [
         {
