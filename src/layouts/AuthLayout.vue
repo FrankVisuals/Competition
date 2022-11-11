@@ -9,17 +9,20 @@ import { useCompetitionsStore } from "../stores/competitions"
 import { watch } from "vue"
 import { useAuthStore } from "../stores/auth"
 import { useFriendsStore } from "../stores/friends"
+import { useTracksStore } from "../stores/tracks"
 
 const authStore = useAuthStore()
 const competitionsStore = useCompetitionsStore()
 const friendsStore = useFriendsStore()
+const tracksStore = useTracksStore()
 
 watch(
   () => authStore.isUserLoaded,
-  (value) => {
+  async (value) => {
     if (value) {
-      competitionsStore.initialize()
-      friendsStore.initialize()
+      await competitionsStore.initialize()
+      await friendsStore.initialize()
+      await tracksStore.initialize()
     }
   },
   { immediate: true }

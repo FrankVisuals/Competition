@@ -55,7 +55,7 @@ const onChange = async () => {
         </button>
       </header>
 
-      <form>
+      <form @submit.prevent>
         <InputField
           placeholder="Current Password"
           v-model="user.current"

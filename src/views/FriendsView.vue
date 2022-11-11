@@ -1,6 +1,7 @@
 <script setup>
 import FriendEntry from "@/components/FriendEntry.vue"
 import FriendDialog from "@/fragments/FriendDialog.vue"
+import InfoBanner from "@/components/InfoBanner.vue"
 import { ref } from "vue"
 import { useFriendsStore } from "../stores/friends"
 
@@ -34,15 +35,18 @@ const openFriendDialog = (id, guest = false) => {
 
       <p
         class="no-more-entries"
-        v-if="Object.keys(friendsStore.friends).length > 0"
+        v-if="Object.keys(friendsStore.friends).length === 0"
       >
-        No more data.
-      </p>
-
-      <p class="no-more-entries" v-else>
         You did not yet add any friends.
         <button @click="openFriendDialog()">Start now</button>
       </p>
+
+      <InfoBanner title="Friends & Guests">
+        You can add other users of this app (Friends) or create guests in case
+        someone does not have an account (yet). This will allow you to track all
+        players. You can later merge guest accounts into real accounts in case
+        someone decides to join with his/her own account.
+      </InfoBanner>
     </div>
   </div>
 

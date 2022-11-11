@@ -39,12 +39,14 @@ defineExpose({
 
 const canWorkOnCompetition = computed(() => {
   return (
-    !competition.data.owner || competition.data.owner === authStore.user.uid
+    !competition.data.owner || competition.data.owner === authStore.firebase.uid
   )
 })
 
 const canDeleteCompetition = computed(() => {
-  return competition.data.owner && competition.data.owner === authStore.user.uid
+  return (
+    competition.data.owner && competition.data.owner === authStore.firebase.uid
+  )
 })
 
 const isInputDisabled = computed(() => {
@@ -72,7 +74,7 @@ const onSave = async () => {
     await busy.load(async () => {
       await competitionsStore.create({
         ...competition.data,
-        owner: authStore.user.uid
+        owner: authStore.firebase.uid
       })
     })
   }
@@ -109,7 +111,7 @@ const onDelete = async () => {
         </button>
       </header>
 
-      <form>
+      <form @submit.prevent>
         <InputField
           placeholder="Name"
           v-model="competition.data.name"
@@ -139,7 +141,7 @@ const onDelete = async () => {
           :busy="isInputDisabled"
         />
 
-        <InfoBanner v-if="!canWorkOnCompetition">
+        <InfoBanner v-if="!canWorkOnCompetition" title="Info">
           You are not the owner of this competition. Therefore, you cannot edit
           it.
         </InfoBanner>
@@ -163,4 +165,9 @@ const onDelete = async () => {
 <style lang="less" scoped>
 @import "../styles/util";
 .dialog();
+
+.info-banner {
+  margin: 1rem;
+  width: ~"calc(100% - 2rem)";
+}
 </style>

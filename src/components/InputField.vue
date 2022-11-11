@@ -64,11 +64,11 @@ const modelValue = useModelWrapper(props, emit, "modelValue")
     width: 100%;
     padding: 0.75rem 1rem;
     outline: none;
-    border-top: 1px solid var(--color-foreground);
-    border-bottom: 1px solid var(--color-foreground);
+    border-top: 2px solid var(--color-foreground);
+    border-bottom: 2px solid var(--color-foreground);
 
     &:focus-visible {
-      border-bottom: 1px solid var(--color-accent);
+      border-bottom: 2px solid var(--color-accent);
     }
   }
 

@@ -26,6 +26,16 @@ export const useCompetitionsStore = defineStore({
     subscription: null,
     authStore: null
   }),
+  getters: {
+    selectable: (state) => {
+      return Object.entries(state.competitions).map(([id, competition]) => {
+        return {
+          key: id,
+          value: competition.name
+        }
+      })
+    }
+  },
   actions: {
     async initialize() {
       if (this.subscription) {
@@ -37,7 +47,7 @@ export const useCompetitionsStore = defineStore({
       this.subscription = onSnapshot(
         query(
           collection(db, "competitions"),
-          where("members", "array-contains", this.authStore.user.uid)
+          where("members", "array-contains", this.authStore.firebase.uid)
         ),
         (snapshot) => {
           this.competitions = {}
@@ -53,8 +63,8 @@ export const useCompetitionsStore = defineStore({
     async create(data) {
       await addDoc(collection(db, "competitions"), {
         ...data,
-        owner: this.authStore.user.uid,
-        members: [this.authStore.user.uid]
+        owner: this.authStore.firebase.uid,
+        members: [this.authStore.firebase.uid]
       })
     },
     async update(id, data) {
@@ -64,7 +74,7 @@ export const useCompetitionsStore = defineStore({
       // no real deletion, but removing the owner
       await updateDoc(doc(db, "competitions", id), {
         owner: null,
-        members: members.filter((m) => m !== this.authStore.user.uid)
+        members: members.filter((m) => m !== this.authStore.firebase.uid)
       })
     }
   }

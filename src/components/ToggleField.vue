@@ -5,7 +5,8 @@ const props = defineProps({
   placeholder: { type: String },
   modelValue: { type: Boolean },
   label: { type: String },
-  busy: { type: Boolean, default: false }
+  busy: { type: Boolean, default: false },
+  vertical: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(["update:modelValue"])
@@ -13,7 +14,7 @@ const modelValue = useModelWrapper(props, emit, "modelValue")
 </script>
 
 <template>
-  <label class="input toggle-field">
+  <label class="input toggle-field" :class="{ vertical: props.vertical }">
     <input
       :disabled="busy"
       type="checkbox"
@@ -71,6 +72,15 @@ const modelValue = useModelWrapper(props, emit, "modelValue")
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
+  }
+
+  &.vertical {
+    flex-direction: column;
+    justify-content: center;
+    .toggle {
+      margin: 0 0 1px 0;
+    }
+    font-size: 10px;
   }
 }
 </style>

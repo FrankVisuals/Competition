@@ -23,7 +23,7 @@ const openCompetitionDialog = (id) => {
         v-for="(competition, id) in competitionsStore.competitions"
         :key="id"
         :name="competition.name"
-        :yours="competition.owner === authStore.user.uid"
+        :yours="competition.owner === authStore.firebase.uid"
         @click="openCompetitionDialog(id)"
       />
 

@@ -78,7 +78,7 @@ const addExistingFriend = async () => {
     return
   }
 
-  await friendsStore.create(user.id, {
+  await friendsStore.add({
     isGuest: false,
     displayName: user.data().displayName,
     alias: null
@@ -95,7 +95,7 @@ const updateFriend = async () => {
 }
 
 const addGuest = async () => {
-  await friendsStore.add({
+  await friendsStore.create({
     isGuest: true,
     displayName: friend.data.displayName,
     alias: null
