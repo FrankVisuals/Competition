@@ -83,6 +83,10 @@ export const useAuthStore = defineStore({
       await updatePassword(this.firebase, updated)
     },
     async getUser() {
+      if (!this.firebase?.uid) {
+        return null
+      }
+
       const user = await getDoc(doc(db, "users", this.firebase.uid))
 
       if (!user?.data()) {
