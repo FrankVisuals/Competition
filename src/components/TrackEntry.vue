@@ -26,7 +26,7 @@ const winners = computed(() => {
 const players = computed(() => {
   return props.track.members
     .map((id) => {
-      if (authStore.firebase.uid === id) {
+      if (authStore.supabase.id === id) {
         return {
           id,
           displayName: authStore.user.displayName

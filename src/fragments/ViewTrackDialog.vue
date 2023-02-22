@@ -30,7 +30,7 @@ defineExpose({
     track.id = id
     const data = JSON.parse(JSON.stringify(t))
 
-    data.owner = friendsStore.getUserName(data.owner)
+    data.user_id = friendsStore.getUserName(data.user_id)
     data.teams.forEach((t) => {
       t.users = t.users.map((u) => {
         return friendsStore.getUserName(u)
@@ -145,7 +145,7 @@ const onDelete = () => {
 
         <label>Created By</label>
         <InputField
-          :modelValue="track.data.owner"
+          :modelValue="track.data.user_id"
           placeholder="User"
           :busy="true"
         />

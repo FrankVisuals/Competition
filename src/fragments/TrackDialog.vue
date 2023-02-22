@@ -37,7 +37,7 @@ defineExpose({
 
 const teamFactory = (initial, hasTeams) => {
   const team = {
-    users: initial ? [authStore.firebase.uid] : [null]
+    users: initial ? [authStore.supabase.id] : [null]
   }
 
   if (initial && hasTeams) {

@@ -38,13 +38,13 @@ const onChangePassword = async () => {
   changepassworddialog.value.open()
 }
 
-const onChangeDisplayName = async (value) => {
+const onChangeAlias = async (value) => {
   await busy.load(async () => {
     await authStore.updateUser({
-      displayName: value
+      alias: value
     })
   })
-  bus.emit("info", `Displayname was updated to ${value}`)
+  bus.emit("info", `Alias was updated to ${value}`)
 }
 </script>
 
@@ -60,10 +60,10 @@ const onChangeDisplayName = async (value) => {
     <InputField
       placeholder="Display Name"
       icon="😊"
-      v-model="user.displayName"
+      v-model="user.alias"
       :busy="busy.isBusy"
       :form="true"
-      @submit="onChangeDisplayName"
+      @submit="onChangeAlias"
     />
     <h2>Actions</h2>
     <button @click="onChangePassword">Change Password</button>
@@ -77,7 +77,7 @@ const onChangeDisplayName = async (value) => {
 
 <style lang="less" scoped>
 .view.profile {
-  padding: 10px;
+  padding: 25px;
 }
 
 .input-field + .input-field {
@@ -85,8 +85,9 @@ const onChangeDisplayName = async (value) => {
 }
 
 h2 {
-  font-size: 18px;
+  font-size: 24px;
   margin-bottom: 10px;
+  font-weight: bold;
 
   &:not(:first-child) {
     margin-top: 30px;

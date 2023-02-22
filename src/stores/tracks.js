@@ -1,16 +1,5 @@
 import { defineStore } from "pinia"
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  limit,
-  onSnapshot,
-  orderBy,
-  query,
-  where
-} from "firebase/firestore"
-import { db } from "../util/firebase"
+
 import { useAuthStore } from "./auth"
 import { useCompetitionsStore } from "./competitions"
 import { useFriendsStore } from "./friends"
@@ -34,10 +23,11 @@ export const useTracksStore = defineStore({
       this.competitionsStore = useCompetitionsStore()
       this.friendsStore = useFriendsStore()
 
+      /*
       this.recentTracksSubscription = onSnapshot(
         query(
           collection(db, "tracks"),
-          where("members", "array-contains", this.authStore.firebase.uid),
+          where("members", "array-contains", this.authStore.supabase.id),
           orderBy("date", "desc"),
           limit(5)
         ),
@@ -51,6 +41,7 @@ export const useTracksStore = defineStore({
           console.error(error)
         }
       )
+      */
     },
     async create(data) {
       const competition = this.competitionsStore.competitions[data.competition]
@@ -86,15 +77,17 @@ export const useTracksStore = defineStore({
           })
       }
 
+      /*
       await addDoc(collection(db, "tracks"), {
         ...trackToAdd,
         date: new Date().toISOString(),
-        owner: this.authStore.firebase.uid,
+        owner: this.authStore.supabase.id,
         members: trackToAdd.teams.map((t) => t.users).flat()
       })
+      */
     },
     async delete(id) {
-      await deleteDoc(doc(db, "tracks", id))
+      // await deleteDoc(doc(db, "tracks", id))
     }
   }
 })

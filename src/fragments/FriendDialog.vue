@@ -13,35 +13,31 @@ const friendsStore = useFriendsStore()
 
 const friend = reactive({
   id: null,
-  data: JSON.parse(JSON.stringify(friendsStore.defaultFriend)),
-  search: null
+  search: null,
+  alias: null,
+  guest: false
 })
 
 defineExpose({
   open: (id, guest = false) => {
     friend.id = id
-    Object.assign(friend.data, {
-      ...JSON.parse(
-        JSON.stringify(
-          id ? friendsStore.friends[id] : friendsStore.defaultFriend
-        )
-      ),
-      isGuest: guest
-    })
+    friend.serach = null
+    friend.alias = id ? friendsStore.friends[id].alias : null
+    friend.is_guest = guest
     dialog.open()
   }
 })
 
 const dialogTitle = computed(() => {
   if (friend.id) {
-    if (friend.data.isGuest) {
+    if (friend.is_guest) {
       return "Edit Guest"
     }
 
     return "Edit Friend"
   }
 
-  if (friend.data.isGuest) {
+  if (friend.is_guest) {
     return "Add Guest"
   }
 
@@ -53,7 +49,7 @@ const onSave = async () => {
     await busy.load(async () => {
       await updateFriend()
     })
-  } else if (friend.data.isGuest) {
+  } else if (friend.is_guest) {
     await busy.load(async () => {
       await addGuest()
     })
@@ -65,8 +61,7 @@ const onSave = async () => {
 }
 
 const addExistingFriend = async () => {
-  const users = await friendsStore.find(friend.search)
-  const [user] = users.docs
+  const [user] = await friendsStore.find(friend.search)
 
   if (!user) {
     bus.emit("error", `User with email "${friend.search}" not found`)
@@ -79,29 +74,27 @@ const addExistingFriend = async () => {
   }
 
   await friendsStore.add({
-    isGuest: false,
-    displayName: user.data().displayName,
-    alias: null
+    friend_id: user.id,
+    is_guest: false,
+    alias: friend.alias || user.alias
   })
 
-  bus.emit("info", `"${user.data().displayName}" was added`)
+  bus.emit("info", `"${user.alias}" was added`)
   dialog.close()
 }
 
 const updateFriend = async () => {
-  await friendsStore.update(friend.id, friend.data)
-  bus.emit("info", `"${friend.data.displayName}" was updated`)
+  await friendsStore.update(friend.id, {
+    alias: friend.alias
+  })
+  bus.emit("info", `"${friend.alias}" was updated`)
   dialog.close()
 }
 
 const addGuest = async () => {
-  await friendsStore.create({
-    isGuest: true,
-    displayName: friend.data.displayName,
-    alias: null
-  })
+  await friendsStore.create(friend.alias)
 
-  bus.emit("info", `Guest "${friend.data.displayName}" was added`)
+  bus.emit("info", `Guest "${friend.alias}" was added`)
   dialog.close()
 }
 
@@ -137,23 +130,15 @@ const onDelete = async () => {
 
       <form @submit.prevent>
         <InputField
-          v-if="!friend.id && !friend.data.isGuest"
+          v-if="!friend.id && !friend.is_guest"
           placeholder="Email"
           v-model="friend.search"
           :busy="busy.isBusy"
         />
 
         <InputField
-          v-if="!!friend.id || friend.data.isGuest"
-          placeholder="Displayname"
-          v-model="friend.data.displayName"
-          :busy="!friend.data.isGuest"
-        />
-
-        <InputField
-          v-if="!!friend.id && !friend.data.isGuest"
           placeholder="Alias"
-          v-model="friend.data.alias"
+          v-model="friend.alias"
           :busy="busy.isBusy"
         />
       </form>

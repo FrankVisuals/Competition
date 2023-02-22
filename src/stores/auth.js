@@ -1,16 +1,6 @@
 import { defineStore } from "pinia"
-import {
-  createUserWithEmailAndPassword,
-  deleteUser,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  sendPasswordResetEmail,
-  signInWithEmailAndPassword,
-  signOut,
-  updatePassword
-} from "firebase/auth"
-import { db, auth } from "../util/firebase"
-import { deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore"
+
+import { supabase } from "../util/supabase"
 
 let resolve
 
@@ -22,88 +12,126 @@ export const useAuthStore = defineStore({
   id: "auth",
   state: () => ({
     user: null,
-    firebase: null,
+    supabase: null,
     initialized: false
   }),
   getters: {
     isUserLoaded() {
-      return !!this.firebase && !!this.user
+      return !!this.supabase && !!this.user
     }
   },
   actions: {
-    async initialize(firebaseUser) {
-      this.firebase = firebaseUser
+    async initialize() {
+      const {
+        data: { user }
+      } = await supabase.auth.getUser()
+      this.supabase = user
       await this.getUser()
       this.initialized = true
-      resolve(firebaseUser)
+      resolve(user)
     },
     async waitForInit() {
       return init
     },
-    async login(data) {
-      const credential = await signInWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      )
+    async login(credentials) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password
+      })
 
-      this.firebase = credential.user
+      if (error) {
+        throw error
+      }
+
+      this.supabase = data.user
+
       await this.getUser()
     },
     async register(user) {
-      const credential = await createUserWithEmailAndPassword(
-        auth,
-        user.email,
-        user.password
-      )
+      const { data, error } = await supabase.auth.signUp({
+        email: user.email,
+        password: user.password
+      })
 
-      this.firebase = credential.user
+      if (error) {
+        throw error
+      }
+
+      this.supabase = data.user
+
       this.createUser()
     },
     async logout() {
-      await signOut(auth)
-      this.firebase = null
+      await supabase.auth.signOut()
+      this.supabase = null
       this.user = null
     },
     async delete() {
-      await deleteDoc(db, "users", this.firebase.uid)
-      await deleteUser(this.firebase)
-      this.firebase = null
+      /**
+       * TODO: There is no delete user functionality
+       * in supabase. Maybe update mail to something invalid?
+       */
+      this.supabase = null
       this.user = null
     },
     async resetPassword(email) {
-      await sendPasswordResetEmail(auth, email)
+      const { error } = supabase.auth.resetPasswordForEmail(email)
+
+      if (error) {
+        throw error
+      }
     },
-    async changePassword(current, updated) {
-      const credential = EmailAuthProvider.credential(
-        this.firebase.email,
-        current
-      )
-      await reauthenticateWithCredential(this.firebase, credential)
-      await updatePassword(this.firebase, updated)
+    async changePassword(updated) {
+      const { error } = await supabase.auth.updateUser({
+        password: updated
+      })
+
+      if (error) {
+        throw error
+      }
     },
     async getUser() {
-      if (!this.firebase?.uid) {
+      if (!this.supabase?.id) {
         return null
       }
 
-      const user = await getDoc(doc(db, "users", this.firebase.uid))
+      const { data, error } = await supabase
+        .from("profiles")
+        .select()
+        .eq("user_id", this.supabase.id)
 
-      if (!user?.data()) {
+      if (error) {
+        throw error
+      }
+
+      if (!data?.length) {
         await this.createUser()
       } else {
-        this.user = user.data()
+        this.user = data[0]
       }
     },
     async createUser() {
-      await setDoc(doc(db, "users", this.firebase.uid), {
-        displayName: this.firebase.displayName,
-        email: this.firebase.email
+      const { error } = await supabase.from("profiles").insert({
+        alias: "",
+        email: this.supabase.email,
+        user_id: this.supabase.id
       })
+
+      if (error) {
+        throw error
+      }
+
       await this.getUser()
     },
     async updateUser(data) {
-      await updateDoc(doc(db, "users", this.firebase.uid), data)
+      const { error } = await supabase
+        .from("profiles")
+        .update(data)
+        .eq("user_id", this.supabase.id)
+
+      if (error) {
+        throw error
+      }
 
       Object.keys(data).forEach((key) => {
         this.user[key] = data[key]

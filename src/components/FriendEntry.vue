@@ -4,10 +4,6 @@ const props = defineProps({
     type: String,
     required: true
   },
-  alias: {
-    type: String,
-    required: false
-  },
   guest: {
     type: Boolean,
     required: true
@@ -19,10 +15,8 @@ const props = defineProps({
   <div class="component friend-entry">
     <div class="left">
       <span class="friend-alias"
-        >{{ props.alias || props.name }}
-        <span class="friend-title" v-if="props.alias || props.guest"
-          >({{ props.guest ? "Guest" : props.name }})</span
-        ></span
+        >{{ props.name }}
+        <span class="friend-title" v-if="props.guest">(Guest)</span></span
       >
     </div>
     <div class="right">

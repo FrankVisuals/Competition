@@ -20,9 +20,8 @@ const openFriendDialog = (id, guest = false) => {
       <FriendEntry
         v-for="(friend, id) in friendsStore.friends"
         :key="id"
-        :name="friend.displayName"
-        :guest="friend.isGuest"
-        :alias="friend.alias"
+        :name="friend.alias"
+        :guest="friend.profiles.is_guest"
         @click="openFriendDialog(id, friend.isGuest)"
       />
 

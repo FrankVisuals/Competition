@@ -40,4 +40,9 @@ const onResetPassword = async () => {
 button {
   margin-top: 15px;
 }
+
+form {
+  max-width: 400px;
+  margin: 0 auto;
+}
 </style>

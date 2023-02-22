@@ -1,35 +1,17 @@
 import { defineStore } from "pinia"
-import {
-  query,
-  collection,
-  onSnapshot,
-  updateDoc,
-  doc,
-  deleteDoc,
-  where,
-  getDocs,
-  setDoc,
-  addDoc
-} from "firebase/firestore"
-import { db } from "../util/firebase"
 import { useAuthStore } from "./auth"
+import { supabase } from "../util/supabase"
 
 export const useFriendsStore = defineStore({
   id: "friends",
   state: () => ({
     friends: [],
-    defaultFriend: {
-      displayName: null,
-      alias: null,
-      isGuest: false
-    },
-    subscription: null,
     authStore: null
   }),
   getters: {
     getUserName(state) {
       return (id) => {
-        if (state.authStore.firebase.uid === id) {
+        if (state.authStore.supabase.id === id) {
           return state.authStore.user.displayName
         }
 
@@ -59,67 +41,90 @@ export const useFriendsStore = defineStore({
         )
         .concat([
           {
-            key: state.authStore.firebase.uid,
-            value: `${state.authStore.firebase.displayName} (You)`
+            key: state.authStore.supabase.id,
+            value: `${state.authStore.supabase.displayName} (You)`
           }
         ])
     }
   },
   actions: {
     async initialize() {
-      if (this.subscription) {
-        return
+      this.authStore = useAuthStore()
+      return this.refresh()
+    },
+    async refresh() {
+      const { error, data } = await supabase
+        .from("friends")
+        .select(
+          `
+          id,
+          friend_id,
+          alias,
+          profiles (
+            is_guest
+          )
+        `
+        )
+        .eq("user_id", this.authStore.supabase.id)
+
+      if (error) {
+        throw error
       }
 
-      this.authStore = useAuthStore()
-
-      this.subscription = onSnapshot(
-        query(collection(db, "users", this.authStore.firebase.uid, "friends")),
-        (snapshot) => {
-          this.friends = {}
-          snapshot.forEach((doc) => {
-            this.friends[doc.id] = doc.data()
-          })
-        },
-        (error) => {
-          console.error(error)
-        }
-      )
+      this.friends = data.reduce((acc, friend) => {
+        acc[friend.id] = friend
+        return acc
+      }, {})
     },
     async find(email) {
-      return await getDocs(
-        query(collection(db, "users"), where("email", "==", email))
-      )
+      const { data, error } = await supabase
+        .from("profiles")
+        .select()
+        .eq("email", email)
+
+      if (error) {
+        throw error
+      }
+
+      return data
     },
-    async create(data) {
+    async create(alias) {
       // 1. create the guest in the users collection
-      const guestUser = await addDoc(collection(db, "users"), {
-        ...data,
-        owner: this.authStore.firebase.uid
-      })
+      const { data, error } = await supabase
+        .from("profiles")
+        .insert({
+          alias: alias,
+          email: null,
+          owner_id: this.authStore.supabase.id,
+          is_guest: true
+        })
+        .select()
+
+      if (error) {
+        throw error
+      }
 
       // 2. add the guest to the friends collection of the current user
-      await setDoc(
-        doc(db, "users", this.authStore.firebase.uid, "friends", guestUser.id),
-        data
-      )
+      await supabase.from("friends").insert({
+        user_id: this.authStore.supabase.id,
+        friend_id: data[0].id,
+        alias
+      })
+
+      // 3. refresh friends
+      await this.refresh()
     },
     async add(data) {
-      await addDoc(
-        collection(db, "users", this.authStore.firebase.uid, "friends"),
-        data
-      )
+      await supabase.from("friends").insert({
+        ...data,
+        user_id: this.authStore.supabase.id
+      })
     },
     async update(id, data) {
-      await updateDoc(
-        doc(db, "users", this.authStore.firebase.uid, "friends", id),
-        data
-      )
+      await supabase.from("friends").update(data).eq("id", id)
     },
     async delete(id) {
-      await deleteDoc(
-        doc(db, "users", this.authStore.firebase.uid, "friends", id)
-      )
+      await supabase.from("friends").delete().eq("id", id)
     }
   }
 })

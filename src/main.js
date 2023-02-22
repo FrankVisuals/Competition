@@ -4,7 +4,7 @@ import { createPinia } from "pinia"
 import App from "./App.vue"
 import router from "./router"
 import bus from "./util/bus"
-import { auth } from "./util/firebase"
+import { supabase } from "./util/supabase"
 import { useAuthStore } from "./stores/auth"
 
 import "./styles/main.less"
@@ -18,7 +18,4 @@ app.config.globalProperties.bus = bus
 app.mount("#app")
 
 const authStore = useAuthStore()
-
-auth.onAuthStateChanged((user) => {
-  authStore.initialize(user)
-})
+authStore.initialize()

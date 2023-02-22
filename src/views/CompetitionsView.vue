@@ -23,11 +23,11 @@ const openCompetitionDialog = (id) => {
         v-for="(competition, id) in competitionsStore.competitions"
         :key="id"
         :name="competition.name"
-        :yours="competition.owner === authStore.firebase.uid"
+        :yours="competition.user_id === authStore.supabase.id"
         @click="openCompetitionDialog(id)"
       />
 
-      <CentralAdd @click="openCompetitionDialog" />
+      <CentralAdd @click="openCompetitionDialog()" />
 
       <p
         class="no-more-entries"
@@ -38,7 +38,7 @@ const openCompetitionDialog = (id) => {
 
       <p class="no-more-entries" v-else>
         You did not yet create any competition.
-        <button @click="openCompetitionDialog">Start now</button>
+        <button @click="openCompetitionDialog()">Start now</button>
       </p>
     </div>
   </div>

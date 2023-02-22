@@ -1,15 +1,6 @@
 import { defineStore } from "pinia"
-import {
-  addDoc,
-  query,
-  where,
-  collection,
-  onSnapshot,
-  updateDoc,
-  doc
-} from "firebase/firestore"
-import { db } from "../util/firebase"
 import { useAuthStore } from "./auth"
+import { supabase } from "../util/supabase"
 
 export const useCompetitionsStore = defineStore({
   id: "competitions",
@@ -20,10 +11,9 @@ export const useCompetitionsStore = defineStore({
       has_teams: false,
       has_points: false,
       highest_points_win: true,
-      owner: null,
+      user_id: null,
       members: []
     },
-    subscription: null,
     authStore: null
   }),
   getters: {
@@ -38,44 +28,40 @@ export const useCompetitionsStore = defineStore({
   },
   actions: {
     async initialize() {
-      if (this.subscription) {
-        return
+      this.authStore = useAuthStore()
+      return this.refresh()
+    },
+    async refresh() {
+      const { error, data } = await supabase
+        .from("competitions")
+        .select()
+        .eq("user_id", this.authStore.supabase.id)
+
+      if (error) {
+        throw error
       }
 
-      this.authStore = useAuthStore()
-
-      this.subscription = onSnapshot(
-        query(
-          collection(db, "competitions"),
-          where("members", "array-contains", this.authStore.firebase.uid)
-        ),
-        (snapshot) => {
-          this.competitions = {}
-          snapshot.forEach((doc) => {
-            this.competitions[doc.id] = doc.data()
-          })
-        },
-        (error) => {
-          console.error(error)
-        }
-      )
+      this.competitions = data.reduce((acc, entry) => {
+        acc[entry.id] = entry
+        return acc
+      }, {})
     },
     async create(data) {
-      await addDoc(collection(db, "competitions"), {
+      await supabase.from("competitions").insert({
         ...data,
-        owner: this.authStore.firebase.uid,
-        members: [this.authStore.firebase.uid]
+        user_id: this.authStore.supabase.id,
+        members: [this.authStore.supabase.id]
       })
+      await this.refresh()
     },
     async update(id, data) {
-      await updateDoc(doc(db, "competitions", id), data)
+      await supabase.from("competitions").update(data).eq("id", id)
+      await this.refresh()
     },
-    async delete(id, { members }) {
+    async delete(id) {
       // no real deletion, but removing the owner
-      await updateDoc(doc(db, "competitions", id), {
-        owner: null,
-        members: members.filter((m) => m !== this.authStore.firebase.uid)
-      })
+      await supabase.from("competitions").update({ user_id: null }).eq("id", id)
+      await this.refresh()
     }
   }
 })

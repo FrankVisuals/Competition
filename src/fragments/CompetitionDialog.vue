@@ -39,13 +39,15 @@ defineExpose({
 
 const canWorkOnCompetition = computed(() => {
   return (
-    !competition.data.owner || competition.data.owner === authStore.firebase.uid
+    !competition.data.user_id ||
+    competition.data.user_id === authStore.supabase.id
   )
 })
 
 const canDeleteCompetition = computed(() => {
   return (
-    competition.data.owner && competition.data.owner === authStore.firebase.uid
+    competition.data.user_id &&
+    competition.data.user_id === authStore.supabase.id
   )
 })
 
@@ -58,7 +60,7 @@ const dialogTitle = computed(() => {
     return "Display Competition"
   }
 
-  if (!competition.data.owner) {
+  if (!competition.data.user_id) {
     return "Add Competition"
   }
 
@@ -66,16 +68,13 @@ const dialogTitle = computed(() => {
 })
 
 const onSave = async () => {
-  if (competition.data.owner) {
+  if (competition.data.user_id) {
     await busy.load(async () => {
       await competitionsStore.update(competition.id, competition.data)
     })
   } else {
     await busy.load(async () => {
-      await competitionsStore.create({
-        ...competition.data,
-        owner: authStore.firebase.uid
-      })
+      await competitionsStore.create(competition.data)
     })
   }
   dialog.close()

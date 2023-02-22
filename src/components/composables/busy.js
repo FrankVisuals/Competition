@@ -24,14 +24,17 @@ export function useBusy() {
     }),
     busy,
     unBusy,
-    load: async (fn) => {
+    load: async (fn, cb) => {
       busy()
       try {
         return await fn()
       } catch (e) {
         if (e.code) {
           bus.emit("error", errorCode[e.code] || e.code)
+        } else if (e.message) {
+          bus.emit("error", e.message)
         }
+        cb && cb(e)
         throw e
       } finally {
         unBusy()
