@@ -60,7 +60,7 @@ const openFriendDialog = (id, guest = false) => {
     flex-direction: column;
     gap: 10px;
     grid-gap: 10px;
-    padding: 15px 10px;
+    padding: 25px;
   }
 
   .actions {

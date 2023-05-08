@@ -41,8 +41,8 @@ export const useFriendsStore = defineStore({
         )
         .concat([
           {
-            key: state.authStore.supabase.id,
-            value: `${state.authStore.supabase.displayName} (You)`
+            key: state.authStore.user.id,
+            value: `${state.authStore.user.alias} (You)`
           }
         ])
     }
@@ -114,17 +114,36 @@ export const useFriendsStore = defineStore({
       // 3. refresh friends
       await this.refresh()
     },
-    async add(data) {
-      await supabase.from("friends").insert({
-        ...data,
+    async add(friendId, alias) {
+      const { error } = await supabase.from("friends").insert({
+        alias,
+        friend_id: friendId,
         user_id: this.authStore.supabase.id
       })
+
+      if (error) {
+        throw error
+      }
+
+      await this.refresh()
     },
     async update(id, data) {
-      await supabase.from("friends").update(data).eq("id", id)
+      const { error } = await supabase.from("friends").update(data).eq("id", id)
+
+      if (error) {
+        throw error
+      }
+
+      await this.refresh()
     },
     async delete(id) {
-      await supabase.from("friends").delete().eq("id", id)
+      const { error } = await supabase.from("friends").delete().eq("id", id)
+
+      if (error) {
+        throw error
+      }
+
+      await this.refresh()
     }
   }
 })

@@ -6,6 +6,7 @@ import SelectField from "@/components/SelectField.vue"
 import ToggleIconField from "@/components/ToggleIconField.vue"
 import AwardIcon from "@/icons/award-icon.vue"
 import AwardIconFilled from "@/icons/award-icon-filled.vue"
+import CloseIcon from "@/icons/close-icon.vue"
 import { useBusy } from "@/components/composables/busy"
 import { useAuthStore } from "../stores/auth"
 import { useCompetitionsStore } from "../stores/competitions"
@@ -37,7 +38,7 @@ defineExpose({
 
 const teamFactory = (initial, hasTeams) => {
   const team = {
-    users: initial ? [authStore.supabase.id] : [null]
+    users: initial ? [authStore.user.id] : [null]
   }
 
   if (initial && hasTeams) {
@@ -149,7 +150,7 @@ const selectableCleaned = (current) => {
       <header>
         <h2>Add Track</h2>
         <button :disabled="busy.isBusy" class="close" @click="dialog.close">
-          Close
+          <CloseIcon />
         </button>
       </header>
 
@@ -219,7 +220,7 @@ const selectableCleaned = (current) => {
       </form>
 
       <footer>
-        <button :disabled="busy.isBusy" @click="onAdd">Add</button>
+        <button :disabled="busy.isBusy" @click="onAdd">Add Track</button>
       </footer>
     </div>
   </div>

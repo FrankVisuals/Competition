@@ -3,6 +3,7 @@ import { defineStore } from "pinia"
 import { useAuthStore } from "./auth"
 import { useCompetitionsStore } from "./competitions"
 import { useFriendsStore } from "./friends"
+import { supabase } from "../util/supabase"
 
 export const useTracksStore = defineStore({
   id: "tracks",
@@ -22,6 +23,17 @@ export const useTracksStore = defineStore({
       this.authStore = useAuthStore()
       this.competitionsStore = useCompetitionsStore()
       this.friendsStore = useFriendsStore()
+
+      const { data, error } = await supabase
+        .from("tracks")
+        .select("competitions(id,name), *")
+        .contains("results", `[{ "users": [${this.authStore.user.id}] }]`)
+
+      if (error) {
+        throw error
+      }
+
+      this.recentTracks = data
 
       /*
       this.recentTracksSubscription = onSnapshot(
@@ -51,9 +63,9 @@ export const useTracksStore = defineStore({
         .map((t) => t.score)
 
       const trackToAdd = {
-        competition: data.competition,
-        title: competition.name,
-        teams: data.teams
+        profile_id: this.authStore.user.id,
+        competition_id: data.competition,
+        results: data.teams
           .filter((t) => !!t.users.filter((u) => !!u).length)
           .map((team) => {
             const mappedTeam = {
@@ -77,17 +89,25 @@ export const useTracksStore = defineStore({
           })
       }
 
-      /*
-      await addDoc(collection(db, "tracks"), {
-        ...trackToAdd,
-        date: new Date().toISOString(),
-        owner: this.authStore.supabase.id,
-        members: trackToAdd.teams.map((t) => t.users).flat()
-      })
-      */
+      const { error, data: insertedTrack } = await supabase
+        .from("tracks")
+        .insert(trackToAdd)
+        .select()
+
+      if (error) {
+        throw error
+      }
+
+      console.log(insertedTrack)
     },
     async delete(id) {
-      // await deleteDoc(doc(db, "tracks", id))
+      const { error } = await supabase.from("tracks").delete().eq("id", id)
+
+      if (error) {
+        throw error
+      }
+
+      // await this.refresh()
     }
   }
 })

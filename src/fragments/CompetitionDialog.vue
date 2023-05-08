@@ -3,11 +3,12 @@ import { useDialog } from "@/components/composables/dialog"
 import InputField from "@/components/InputField.vue"
 import ToggleField from "@/components/ToggleField.vue"
 import InfoBanner from "@/components/InfoBanner.vue"
+import CloseIcon from "@/icons/close-icon.vue"
 import { computed, reactive } from "vue"
 import { useAuthStore } from "../stores/auth"
 import { useCompetitionsStore } from "../stores/competitions"
 import bus from "../util/bus"
-import { useBusy } from "../components/composables/busy"
+import { useBusy } from "@/components/composables/busy"
 
 const dialog = useDialog()
 const busy = useBusy()
@@ -106,7 +107,7 @@ const onDelete = async () => {
       <header>
         <h2>{{ dialogTitle }}</h2>
         <button class="close" :disabled="busy.isBusy" @click="dialog.close">
-          Close
+          <CloseIcon />
         </button>
       </header>
 

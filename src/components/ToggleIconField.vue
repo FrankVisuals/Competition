@@ -44,7 +44,7 @@ const modelValue = useModelWrapper(props, emit, "modelValue")
   &.active::v-deep {
     svg {
       opacity: 1;
-      fill: #e4cc37;
+      fill: #222;
     }
   }
 

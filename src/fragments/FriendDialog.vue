@@ -1,10 +1,11 @@
 <script setup>
 import { useDialog } from "@/components/composables/dialog"
 import InputField from "@/components/InputField.vue"
+import CloseIcon from "@/icons/close-icon.vue"
 import { computed, reactive } from "vue"
 import bus from "../util/bus"
 import { useFriendsStore } from "../stores/friends"
-import { useBusy } from "../components/composables/busy"
+import { useBusy } from "@/components/composables/busy"
 
 const dialog = useDialog()
 const busy = useBusy()
@@ -73,13 +74,13 @@ const addExistingFriend = async () => {
     return
   }
 
-  await friendsStore.add({
-    friend_id: user.id,
-    is_guest: false,
-    alias: friend.alias || user.alias
-  })
+  await friendsStore.add(user.id, friend.alias || user.alias)
 
-  bus.emit("info", `"${user.alias}" was added`)
+  bus.emit(
+    "info",
+    `"${user.alias}" was added with alias "${friend.alias || user.alias}"`
+  )
+
   dialog.close()
 }
 
@@ -125,7 +126,7 @@ const onDelete = async () => {
     <div class="dialog-content">
       <header>
         <h2>{{ dialogTitle }}</h2>
-        <button class="close" @click="dialog.close">Close</button>
+        <button class="close" @click="dialog.close"><CloseIcon /></button>
       </header>
 
       <form @submit.prevent>

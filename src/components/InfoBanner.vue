@@ -1,6 +1,4 @@
 <script setup>
-import InfoIcon from "@/icons/info-icon.vue"
-
 const props = defineProps({
   title: {
     required: false,
@@ -12,7 +10,6 @@ const props = defineProps({
 <template>
   <div class="info-banner">
     <header>
-      <InfoIcon />
       <h2 v-if="props.title">{{ title }}</h2>
     </header>
 
@@ -27,7 +24,7 @@ const props = defineProps({
   width: 100%;
   border: 1px solid var(--color-info);
   background: var(--color-info-background);
-  padding: 1rem;
+  padding: 1.5rem;
   border-radius: 3px;
 
   header {
@@ -35,7 +32,7 @@ const props = defineProps({
     align-items: center;
     justify-content: flex-start;
     width: 100%;
-    margin-bottom: 0.25rem;
+    margin-bottom: 1rem;
 
     h2 {
       margin: 0;

@@ -14,7 +14,7 @@ const friendsStore = useFriendsStore()
 const authStore = useAuthStore()
 
 const winners = computed(() => {
-  return props.track.teams.reduce((acc, team) => {
+  return props.track.results.reduce((acc, team) => {
     if (team.has_won) {
       acc = acc.concat(team.users)
     }
@@ -24,26 +24,27 @@ const winners = computed(() => {
 })
 
 const players = computed(() => {
-  return props.track.members
+  return props.track.results
+    .flatMap((team) => team.users)
     .map((id) => {
-      if (authStore.supabase.id === id) {
+      if (authStore.user.id === id) {
         return {
           id,
-          displayName: authStore.user.displayName
+          alias: authStore.user.alias
         }
       }
 
       return {
         id,
-        displayName: friendsStore.friends[id]?.displayName || "Unknown"
+        alias: friendsStore.friends[id]?.alias || "Unknown"
       }
     })
     .map((user) => {
       if (winners.value.indexOf(user.id) > -1) {
-        return `👑 ${user.displayName}`
+        return `👑 ${user.alias}`
       }
 
-      return user.displayName
+      return user.alias
     })
 })
 </script>
@@ -51,12 +52,12 @@ const players = computed(() => {
 <template>
   <div class="component track-entry">
     <div class="left">
-      <span class="track-title">{{ props.track.title }}</span>
+      <span class="track-title">{{ props.track.competitions.name }}</span>
       <span class="track-players">{{ players.join(", ") }}</span>
     </div>
     <div class="right">
       <span class="track-date">{{
-        new Date(props.track.date).toLocaleDateString()
+        new Date(props.track.created_at).toLocaleDateString()
       }}</span>
     </div>
   </div>
