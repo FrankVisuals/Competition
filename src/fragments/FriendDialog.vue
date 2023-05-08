@@ -21,7 +21,7 @@ const friend = reactive({
 defineExpose({
   open: (id, guest = false) => {
     friend.id = id
-    friend.serach = null
+    friend.search = null
     friend.alias = id ? friendsStore.friends[id].alias : null
     friend.is_guest = guest
     dialog.open()
@@ -163,4 +163,10 @@ const onDelete = async () => {
 <style lang="less" scoped>
 @import "../styles/util";
 .dialog();
+
+.dialog-content form {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1rem;
+}
 </style>

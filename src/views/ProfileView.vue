@@ -68,8 +68,10 @@ const onChangeAlias = async (value) => {
     <h2>Actions</h2>
     <button @click="onChangePassword">Change Password</button>
     <button @click="onLogout">Logout</button>
+    <!-- supabase does currently not offer a delete
     <h2>Danger Zone</h2>
     <button @click="onDeleteAccount" class="negative">Delete Account</button>
+    -->
   </div>
 
   <ChangePasswordDialog ref="changepassworddialog" />

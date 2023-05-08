@@ -53,7 +53,7 @@ watch(
 }
 
 main {
-  padding-top: 14rem;
+  padding-top: 20%;
 }
 
 .flex-center {
