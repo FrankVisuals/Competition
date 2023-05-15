@@ -4,16 +4,15 @@ import { supabase } from "../util/supabase"
 
 let resolve
 
-const init = new Promise((r) => {
-  resolve = r
-})
-
 export const useAuthStore = defineStore({
   id: "auth",
   state: () => ({
     user: null,
     supabase: null,
-    initialized: false
+    initialized: false,
+    init: new Promise((r) => {
+      resolve = r
+    })
   }),
   getters: {
     isUserLoaded() {
@@ -27,11 +26,11 @@ export const useAuthStore = defineStore({
       } = await supabase.auth.getUser()
       this.supabase = user
       await this.getUser()
-      this.initialized = true
       resolve(user)
+      this.initialized = true
     },
     async waitForInit() {
-      return init
+      return this.init
     },
     async login(credentials) {
       const { data, error } = await supabase.auth.signInWithPassword({

@@ -28,7 +28,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <RouterView />
+  <RouterView v-if="authStore.initialized" />
   <GlobalNotifications />
   <GlobalDeleteHandler />
 </template>

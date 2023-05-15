@@ -6,7 +6,7 @@ import Profile from "@/icons/profile-icon.vue"
 import Friends from "@/icons/friends-icon.vue"
 
 import { useCompetitionsStore } from "../stores/competitions"
-import { watch } from "vue"
+import { watch, ref } from "vue"
 import { useAuthStore } from "../stores/auth"
 import { useFriendsStore } from "../stores/friends"
 import { useTracksStore } from "../stores/tracks"
@@ -16,6 +16,8 @@ const competitionsStore = useCompetitionsStore()
 const friendsStore = useFriendsStore()
 const tracksStore = useTracksStore()
 
+const allInitialized = ref(false)
+
 watch(
   () => authStore.isUserLoaded,
   async (value) => {
@@ -23,6 +25,8 @@ watch(
       await competitionsStore.initialize()
       await friendsStore.initialize()
       await tracksStore.initialize()
+
+      allInitialized.value = true
     }
   },
   { immediate: true }
@@ -31,7 +35,7 @@ watch(
 
 <template>
   <div id="view-wrap" v-if="authStore.isUserLoaded">
-    <RouterView />
+    <RouterView v-if="allInitialized" />
   </div>
   <footer id="main-navigation">
     <RouterLink :to="{ name: 'dashboard' }"><DashboardIcon /></RouterLink>

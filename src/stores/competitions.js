@@ -62,6 +62,9 @@ export const useCompetitionsStore = defineStore({
       // no real deletion, but removing the owner
       await supabase.from("competitions").update({ user_id: null }).eq("id", id)
       await this.refresh()
+    },
+    async loadStatisticsFor(id) {
+      await supabase.from("tracks").select().eq("competition_id", id)
     }
   }
 })

@@ -12,6 +12,10 @@ export const useTracksStore = defineStore({
       competition: null,
       teams: []
     },
+    statistics: {
+      competition_id: null,
+      entries: []
+    },
     recentTracksSubscription: null,
     recentTracks: null,
     authStore: null,
@@ -24,6 +28,10 @@ export const useTracksStore = defineStore({
       this.competitionsStore = useCompetitionsStore()
       this.friendsStore = useFriendsStore()
 
+      await this.refresh()
+    },
+
+    async refresh() {
       const { data, error } = await supabase
         .from("tracks")
         .select("competitions(id,name), *")
@@ -34,27 +42,8 @@ export const useTracksStore = defineStore({
       }
 
       this.recentTracks = data
-
-      /*
-      this.recentTracksSubscription = onSnapshot(
-        query(
-          collection(db, "tracks"),
-          where("members", "array-contains", this.authStore.supabase.id),
-          orderBy("date", "desc"),
-          limit(5)
-        ),
-        (snapshot) => {
-          this.recentTracks = {}
-          snapshot.forEach((doc) => {
-            this.recentTracks[doc.id] = doc.data()
-          })
-        },
-        (error) => {
-          console.error(error)
-        }
-      )
-      */
     },
+
     async create(data) {
       const competition = this.competitionsStore.competitions[data.competition]
 
@@ -89,7 +78,7 @@ export const useTracksStore = defineStore({
           })
       }
 
-      const { error, data: insertedTrack } = await supabase
+      const { error } = await supabase
         .from("tracks")
         .insert(trackToAdd)
         .select()
@@ -98,8 +87,9 @@ export const useTracksStore = defineStore({
         throw error
       }
 
-      console.log(insertedTrack)
+      await this.refresh()
     },
+
     async delete(id) {
       const { error } = await supabase.from("tracks").delete().eq("id", id)
 
@@ -107,7 +97,26 @@ export const useTracksStore = defineStore({
         throw error
       }
 
-      // await this.refresh()
+      await this.refresh()
+    },
+
+    async loadStatistics(competition_id) {
+      this.statistics.competition_id = competition_id
+      this.statistics.entries = []
+
+      const { data, error } = await supabase
+        .from("tracks")
+        .select("competitions(id,name), *")
+        .eq("competition_id", competition_id)
+        .contains("results", `[{ "users": [${this.authStore.user.id}] }]`)
+
+      if (error) {
+        throw error
+      }
+
+      this.statistics.entries = data
+
+      console.log(data)
     }
   }
 })
