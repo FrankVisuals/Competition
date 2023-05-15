@@ -22,7 +22,7 @@ const openFriendDialog = (id, guest = false) => {
         :key="id"
         :name="friend.alias"
         :guest="friend.profiles.is_guest"
-        @click="openFriendDialog(id, friend.isGuest)"
+        @click="openFriendDialog(id, friend.profiles.is_guest)"
       />
 
       <div class="actions">

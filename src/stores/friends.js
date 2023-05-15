@@ -24,6 +24,18 @@ export const useFriendsStore = defineStore({
         return "unknown"
       }
     },
+    selectableNonGuestFriends: (state) => {
+      return Object.entries(state.friends)
+        .filter(([, friend]) => {
+          return !friend.profiles.is_guest
+        })
+        .map(([id, friend]) => {
+          return {
+            key: id,
+            value: friend.alias || friend.displayName
+          }
+        })
+    },
     selectable: (state) => {
       return [
         {

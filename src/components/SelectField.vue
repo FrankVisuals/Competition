@@ -19,7 +19,10 @@ const modelValue = useModelWrapper(props, emit, "modelValue")
 </script>
 
 <template>
-  <div class="input select-field" :class="{ icon: !!props.icon }">
+  <div
+    class="input select-field"
+    :class="{ icon: !!props.icon, busy: !!props.busy }"
+  >
     <div class="icon">{{ props.icon }}</div>
     <select :disabled="busy" v-model="modelValue">
       <option v-for="option in options" :key="option.key" :value="option.key">
@@ -37,6 +40,10 @@ const modelValue = useModelWrapper(props, emit, "modelValue")
   width: 100%;
   background: var(--color-foreground);
   position: relative;
+
+  &.busy {
+    opacity: 0.5;
+  }
 
   .icon {
     position: absolute;

@@ -1,6 +1,7 @@
 <script setup>
 import { useDialog } from "@/components/composables/dialog"
 import InputField from "@/components/InputField.vue"
+import SelectField from "@/components/SelectField.vue"
 import CloseIcon from "@/icons/close-icon.vue"
 import { computed, reactive } from "vue"
 import bus from "../util/bus"
@@ -17,6 +18,10 @@ const friend = reactive({
   search: null,
   alias: null,
   guest: false
+})
+
+const transferToUser = reactive({
+  id: null
 })
 
 defineExpose({
@@ -142,6 +147,32 @@ const onDelete = async () => {
           v-model="friend.alias"
           :busy="busy.isBusy"
         />
+
+        <div class="transfer-guest" v-if="friend.is_guest && friend.id">
+          <span class="title">Transfer Guest Account</span>
+          <p>
+            You can merge guest accounts you have created with the account of a
+            friend in order to transfer all records you have created with the
+            guest account to a real account.
+          </p>
+          <SelectField
+            class="select-friend"
+            placeholder="Friend"
+            v-model="transferToUser.id"
+            :busy="
+              busy.isBusy || !friendsStore.selectableNonGuestFriends.length
+            "
+            icon="😊"
+            :options="friendsStore.selectableNonGuestFriends"
+          />
+
+          <p
+            class="no-friends-note"
+            v-if="!friendsStore.selectableNonGuestFriends.length"
+          >
+            You have not yet added any non-guest friends.
+          </p>
+        </div>
       </form>
 
       <footer>
@@ -169,5 +200,23 @@ const onDelete = async () => {
   padding-left: 1rem;
   padding-right: 1rem;
   padding-top: 1rem;
+}
+
+.transfer-guest {
+  margin-top: 1rem;
+
+  .title {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .select-friend {
+    margin-top: 1rem;
+  }
+
+  .no-friends-note {
+    margin-top: 1rem;
+  }
 }
 </style>

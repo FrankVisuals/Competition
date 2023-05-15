@@ -1,35 +1,28 @@
-# compi
+# Competition Tracker
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+This supabase app allows to create & track competitive games, sports, actitivites.
 
 ## Project Setup
 
 ```sh
-npm install
+yarn install
+yarn dev
 ```
 
-### Compile and Hot-Reload for Development
+## Compile and Minify for Production
 
 ```sh
-npm run dev
+yarn build
 ```
 
-### Compile and Minify for Production
+## Todos
 
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+- [] See competitions of friends
+- [] Merge guests into friends
+- [] Only allow to merge if you own the guest profile
+- [] Only allow to create tracks with people who are friends
+- [] Add simple statistics per game on dashboard
+- [] Limit recent records to 5 on dashboard
+- [] Add "party" mode (keep same players selected when adding a track)
+- [] PWA features
+- [] Deploy Version
