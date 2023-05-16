@@ -1,41 +1,44 @@
 <script setup>
 import CentralAdd from "@/components/CentralAdd.vue"
-import TrackEntry from "@/components/TrackEntry.vue"
+import CompetitionEntry from "@/components/CompetitionEntry.vue"
 import CompetitionDialog from "@/fragments/CompetitionDialog.vue"
 import { ref } from "vue"
+import { useAuthStore } from "../stores/auth"
 import { useCompetitionsStore } from "../stores/competitions"
 
 const competitionsStore = useCompetitionsStore()
+const authStore = useAuthStore()
 
 const competitiondialog = ref(null)
 
-const openCompetitionDialog = () => {
-  competitiondialog.value.open()
+const openCompetitionDialog = (id) => {
+  competitiondialog.value.open(id)
 }
 </script>
 
 <template>
   <div class="view competitions">
     <div class="list">
-      <TrackEntry
-        v-for="(competition, i) in competitionsStore.competitions"
-        :key="i"
+      <CompetitionEntry
+        v-for="(competition, id) in competitionsStore.competitions"
+        :key="id"
         :name="competition.name"
-        :count="0"
+        :yours="competition.user_id === authStore.supabase.id"
+        @click="openCompetitionDialog(id)"
       />
 
-      <CentralAdd @click="openCompetitionDialog" />
+      <CentralAdd @click="openCompetitionDialog()" />
 
       <p
         class="no-more-entries"
-        v-if="competitionsStore.competitions.length > 0"
+        v-if="Object.keys(competitionsStore.competitions).length > 0"
       >
         No more data.
       </p>
 
       <p class="no-more-entries" v-else>
         You did not yet create any competition.
-        <button @click="openCompetitionDialog">Start now</button>
+        <button @click="openCompetitionDialog()">Start now</button>
       </p>
     </div>
   </div>
@@ -51,7 +54,7 @@ const openCompetitionDialog = () => {
     flex-direction: column;
     gap: 10px;
     grid-gap: 10px;
-    padding: 15px 10px;
+    padding: 1rem;
   }
 
   .no-more-entries {

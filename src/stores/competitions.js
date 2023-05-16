@@ -1,8 +1,6 @@
 import { defineStore } from "pinia"
-import { db } from "../util/firebase"
-import { doc, setDoc } from "firebase/firestore"
-
-import { collection, onSnapshot } from "firebase/firestore"
+import { useAuthStore } from "./auth"
+import { supabase } from "../util/supabase"
 
 export const useCompetitionsStore = defineStore({
   id: "competitions",
@@ -11,29 +9,62 @@ export const useCompetitionsStore = defineStore({
     defaultCompetition: {
       name: null,
       has_teams: false,
-      has_points: false
+      has_points: false,
+      highest_points_win: true,
+      user_id: null,
+      members: []
     },
-    subscription: null
+    authStore: null
   }),
+  getters: {
+    selectable(state) {
+      return Object.entries(state.competitions).map(([id, competition]) => {
+        return {
+          key: id,
+          value: competition.name
+        }
+      })
+    }
+  },
   actions: {
-    async reload() {
-      if (!this.subscription) {
-        this.subscription = onSnapshot(
-          collection(db, "competitions"),
-          (snapshot) => {
-            this.competitions = []
-            snapshot.forEach((doc) => {
-              this.competitions.push(doc.data())
-            })
-          },
-          (error) => {
-            console.error(error)
-          }
-        )
+    async initialize() {
+      this.authStore = useAuthStore()
+      return this.refresh()
+    },
+    async refresh() {
+      const { error, data } = await supabase
+        .from("competitions")
+        .select()
+        .eq("user_id", this.authStore.supabase.id)
+
+      if (error) {
+        throw error
       }
+
+      this.competitions = data.reduce((acc, entry) => {
+        acc[entry.id] = entry
+        return acc
+      }, {})
     },
     async create(data) {
-      await setDoc(doc(db, "competitions"), data)
+      await supabase.from("competitions").insert({
+        ...data,
+        user_id: this.authStore.supabase.id,
+        members: [this.authStore.supabase.id]
+      })
+      await this.refresh()
+    },
+    async update(id, data) {
+      await supabase.from("competitions").update(data).eq("id", id)
+      await this.refresh()
+    },
+    async delete(id) {
+      // no real deletion, but removing the owner
+      await supabase.from("competitions").update({ user_id: null }).eq("id", id)
+      await this.refresh()
+    },
+    async loadStatisticsFor(id) {
+      await supabase.from("tracks").select().eq("competition_id", id)
     }
   }
 })

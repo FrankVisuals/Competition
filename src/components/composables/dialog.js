@@ -3,7 +3,6 @@ import { reactive } from "vue"
 export function useDialog() {
   const data = reactive({
     open: false,
-    loading: false,
     closing: false
   })
 

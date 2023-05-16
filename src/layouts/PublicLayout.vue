@@ -39,6 +39,9 @@ watch(
       <section class="view">
         <RouterView />
       </section>
+      <footer>
+        <RouterLink :to="{ name: 'reset-password' }">Reset Password</RouterLink>
+      </footer>
     </main>
   </div>
 </template>
@@ -50,7 +53,7 @@ watch(
 }
 
 main {
-  padding-top: 14rem;
+  padding-top: 20%;
 }
 
 .flex-center {
@@ -91,6 +94,16 @@ section {
         border-bottom: 1px solid var(--color-accent);
       }
     }
+  }
+}
+
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  a.router-link-exact-active {
+    border-bottom: 1px solid var(--color-accent);
   }
 }
 </style>

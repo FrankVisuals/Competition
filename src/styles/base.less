@@ -9,6 +9,9 @@
 
   --vt-c-red: @color-red;
   --vt-c-green: @color-green;
+  --vt-c-orange: @color-orange;
+  --vt-c-blue: @color-blue;
+  --vt-c-blue-light: lighten(@color-blue, 35%);
 }
 
 /* semantic color variables for this project */
@@ -21,6 +24,9 @@
   --color-accent: var(--vt-c-accent);
   --color-positive: var(--vt-c-green);
   --color-negative: var(--vt-c-red);
+  --color-warning: var(--vt-c-orange);
+  --color-info: var(--vt-c-blue);
+  --color-info-background: var(--vt-c-blue-light);
 }
 
 *,
@@ -38,8 +44,9 @@ body {
   background: var(--color-background);
   transition: color 0.5s, background-color 0.5s;
   line-height: 1.6;
-  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-    Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   font-size: 15px;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

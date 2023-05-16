@@ -3,41 +3,32 @@ import { ref } from "vue"
 import InputField from "@/components/InputField.vue"
 import { useBusy } from "@/components/composables/busy"
 import { useAuthStore } from "../stores/auth"
-import { useRouter } from "vue-router"
+import bus from "../util/bus"
 
 const authStore = useAuthStore()
 const busy = useBusy()
-const router = useRouter()
 
 const user = ref({
-  email: null,
-  password: null
+  email: null
 })
 
-const onRegister = async () => {
+const onResetPassword = async () => {
   await busy.load(async () => {
-    await authStore.register(user.value)
+    await authStore.resetPassword(user.value.email)
   })
-  router.replace({ name: "dashboard" })
+  bus.emit("info", "Reset mail was sent")
 }
 </script>
 
 <template>
-  <form @submit.prevent="onRegister">
+  <form @submit.prevent="onResetPassword">
     <InputField
       placeholder="Email"
       icon="📧"
       v-model="user.email"
       :busy="busy.isBusy"
     />
-    <InputField
-      placeholder="Password"
-      icon="🔐"
-      type="password"
-      v-model="user.password"
-      :busy="busy.isBusy"
-    />
-    <button :disabled="busy.isBusy">Register</button>
+    <button :disabled="busy.isBusy">Reset Password</button>
   </form>
 </template>
 
