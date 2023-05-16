@@ -36,6 +36,7 @@ export const useTracksStore = defineStore({
         .from("tracks")
         .select("competitions(id,name), *")
         .contains("results", `[{ "users": [${this.authStore.user.id}] }]`)
+        .limit(3)
 
       if (error) {
         throw error
@@ -108,15 +109,33 @@ export const useTracksStore = defineStore({
         .from("tracks")
         .select("competitions(id,name), *")
         .eq("competition_id", competition_id)
-        .contains("results", `[{ "users": [${this.authStore.user.id}] }]`)
 
       if (error) {
         throw error
       }
 
-      this.statistics.entries = data
+      const statistics = data.reduce((acc, entry) => {
+        entry.results.forEach((team) => {
+          team.users.forEach((user) => {
+            if (!acc[user]) {
+              acc[user] = {
+                user_id: user,
+                alias: this.friendsStore.getUserName(user),
+                score: 1000,
+                played: 0
+              }
+            }
 
-      console.log(data)
+            acc[user].played++
+            acc[user].score += team.has_won ? 26 : -24
+          })
+        })
+        return acc
+      }, {})
+
+      this.statistics.entries = Object.values(statistics).sort((a, b) => {
+        return b.score - a.score
+      })
     }
   }
 })

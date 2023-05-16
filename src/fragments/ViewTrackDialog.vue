@@ -4,6 +4,7 @@ import { useDialog } from "@/components/composables/dialog"
 import InputField from "@/components/InputField.vue"
 import SelectField from "@/components/SelectField.vue"
 import ToggleIconField from "@/components/ToggleIconField.vue"
+import CloseIcon from "@/icons/close-icon.vue"
 import AwardIcon from "@/icons/award-icon.vue"
 import AwardIconFilled from "@/icons/award-icon-filled.vue"
 import InfoBanner from "@/components/InfoBanner.vue"
@@ -26,13 +27,13 @@ const track = reactive({
 })
 
 defineExpose({
-  open: (id, t) => {
-    track.id = id
-    const data = JSON.parse(JSON.stringify(t))
+  open: (t) => {
+    track.id = t.id
 
-    data.user_id = friendsStore.getUserName(data.user_id)
-    data.teams.forEach((t) => {
-      t.users = t.users.map((u) => {
+    const data = JSON.parse(JSON.stringify(t))
+    data.createdBy = friendsStore.getUserName(data.profile_id)
+    data.results.forEach((team) => {
+      team.users = team.users.map((u) => {
         return friendsStore.getUserName(u)
       })
     })
@@ -44,11 +45,11 @@ defineExpose({
 })
 
 const competition = computed(() => {
-  if (!track.data.competition) {
+  if (!track.data.competition_id) {
     return null
   }
 
-  return competitionsStore.competitions[track.data.competition]
+  return competitionsStore.competitions[track.data.competition_id]
 })
 
 const onDelete = () => {
@@ -79,14 +80,14 @@ const onDelete = () => {
       <header>
         <h2>View Track</h2>
         <button :disabled="busy.isBusy" class="close" @click="dialog.close">
-          Close
+          <CloseIcon />
         </button>
       </header>
 
       <form @submit.prevent>
         <SelectField
           placeholder="Competition"
-          v-model="track.data.competition"
+          v-model="track.data.competition_id"
           :busy="true"
           icon="⚔️"
           :options="competitionsStore.selectable"
@@ -96,7 +97,7 @@ const onDelete = () => {
           <h3 v-if="competition">Participants</h3>
           <div
             class="team-container"
-            v-for="(team, i) in track.data.teams"
+            v-for="(team, i) in track.data.results"
             :key="i"
           >
             <span class="team-title" v-if="competition.has_teams"
@@ -138,14 +139,14 @@ const onDelete = () => {
 
         <label>Created At</label>
         <InputField
-          :modelValue="new Date(track.data.date).toLocaleDateString()"
+          :modelValue="new Date(track.data.created_at).toLocaleDateString()"
           placeholder="Date"
           :busy="true"
         />
 
         <label>Created By</label>
         <InputField
-          :modelValue="track.data.user_id"
+          :modelValue="track.data.createdBy"
           placeholder="User"
           :busy="true"
         />

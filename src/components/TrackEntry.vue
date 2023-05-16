@@ -11,7 +11,6 @@ const props = defineProps({
 })
 
 const friendsStore = useFriendsStore()
-const authStore = useAuthStore()
 
 const winners = computed(() => {
   return props.track.results.reduce((acc, team) => {
@@ -27,16 +26,9 @@ const players = computed(() => {
   return props.track.results
     .flatMap((team) => team.users)
     .map((id) => {
-      if (authStore.user.id === id) {
-        return {
-          id,
-          alias: authStore.user.alias
-        }
-      }
-
       return {
         id,
-        alias: friendsStore.friends[id]?.alias || "Unknown"
+        alias: friendsStore.getUserName(id)
       }
     })
     .map((user) => {

@@ -11,14 +11,16 @@ export const useFriendsStore = defineStore({
   getters: {
     getUserName(state) {
       return (id) => {
-        if (state.authStore.supabase.id === id) {
-          return state.authStore.user.displayName
+        if (state.authStore.user.id === id) {
+          return state.authStore.user.alias
         }
 
-        const friend = state.friends[id]
+        const friend = Object.values(state.friends).find((friend) => {
+          return friend.friend_id === id
+        })
 
         if (friend) {
-          return friend.displayName
+          return friend.alias
         }
 
         return "unknown"
@@ -32,7 +34,7 @@ export const useFriendsStore = defineStore({
         .map(([id, friend]) => {
           return {
             key: id,
-            value: friend.alias || friend.displayName
+            value: friend.alias
           }
         })
     },
@@ -44,10 +46,10 @@ export const useFriendsStore = defineStore({
         }
       ]
         .concat(
-          Object.entries(state.friends).map(([id, friend]) => {
+          Object.values(state.friends).map((friend) => {
             return {
-              key: id,
-              value: friend.alias || friend.displayName
+              key: friend.friend_id,
+              value: friend.alias
             }
           })
         )

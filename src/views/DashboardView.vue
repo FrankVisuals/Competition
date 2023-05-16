@@ -19,8 +19,8 @@ const openTrackDialog = () => {
 
 const viewTrackDialog = ref(null)
 
-const openViewTrackDialog = (id, track) => {
-  viewTrackDialog.value.open(id, track)
+const openViewTrackDialog = (track) => {
+  viewTrackDialog.value.open(track)
 }
 
 const tracksStore = useTracksStore()
@@ -42,7 +42,16 @@ onMounted(async () => {
         Object.keys(availableCompetitions).length
       ) {
         statistics.competitionId = Object.values(availableCompetitions)[0].id
-        tracksStore.loadStatistics(statistics.competitionId)
+      }
+    },
+    { immediate: true }
+  )
+
+  watch(
+    () => statistics.competitionId,
+    (id) => {
+      if (id) {
+        tracksStore.loadStatistics(id)
       }
     },
     { immediate: true }
@@ -59,7 +68,7 @@ onMounted(async () => {
           v-for="(track, key) in tracksStore.recentTracks"
           :key="key"
           :track="track"
-          @click="openViewTrackDialog(key, track)"
+          @click="openViewTrackDialog(track)"
         />
       </div>
     </section>
@@ -75,11 +84,12 @@ onMounted(async () => {
         :options="competitionsStore.selectable"
       />
 
-      <div class="list" v-if="tracksStore.statistics.length">
+      <div class="list" v-if="tracksStore.statistics.entries.length">
         <StatsEntry
-          v-for="(entry, id) in tracksStore.statistics"
+          v-for="(entry, id) in tracksStore.statistics.entries"
           :key="id"
-          :name="entry.name"
+          :name="entry.alias"
+          :score="entry.score"
         />
       </div>
 
@@ -127,6 +137,14 @@ section {
 
   .info-banner {
     margin-top: 1rem;
+  }
+
+  .list {
+    margin-top: 1rem;
+
+    .component.stats-entry {
+      margin-bottom: 0.5rem;
+    }
   }
 }
 </style>

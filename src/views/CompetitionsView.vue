@@ -54,7 +54,7 @@ const openCompetitionDialog = (id) => {
     flex-direction: column;
     gap: 10px;
     grid-gap: 10px;
-    padding: 25px;
+    padding: 1rem;
   }
 
   .no-more-entries {

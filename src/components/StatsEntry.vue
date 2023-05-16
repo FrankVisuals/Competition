@@ -3,6 +3,10 @@ const props = defineProps({
   name: {
     type: String,
     required: true
+  },
+  score: {
+    type: Number,
+    required: true
   }
 })
 </script>
@@ -10,20 +14,16 @@ const props = defineProps({
 <template>
   <div class="component stats-entry">
     <div class="left">
-      <span class="stats-alias"
-        >{{ props.name }}
-        <span class="friend-title" v-if="props.guest">(Guest)</span></span
-      >
+      <span class="stats-name">{{ props.name }}</span>
     </div>
     <div class="right">
-      <span class="friend-guest" v-if="props.guest">🤖</span>
-      <span class="friend-guest" v-if="!props.guest">😊</span>
+      <span class="date">{{ score }}</span>
     </div>
   </div>
 </template>
 
 <style lang="less" scoped>
-.component.friend-entry {
+.component.stats-entry {
   border: 1px solid var(--color-border);
   padding: 1rem 1.5rem;
 

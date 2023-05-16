@@ -79,7 +79,7 @@ const onChangeAlias = async (value) => {
 
 <style lang="less" scoped>
 .view.profile {
-  padding: 25px;
+  padding: 1rem;
 }
 
 .input-field + .input-field {

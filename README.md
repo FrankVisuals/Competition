@@ -21,8 +21,8 @@ yarn build
 - [] Merge guests into friends
 - [] Only allow to merge if you own the guest profile
 - [] Only allow to create tracks with people who are friends
-- [] Add simple statistics per game on dashboard
-- [] Limit recent records to 5 on dashboard
+- [X] Add simple statistics per game on dashboard
+- [X] Limit recent records to 3 on dashboard
 - [] Add "party" mode (keep same players selected when adding a track)
 - [] PWA features
 - [] Deploy Version
