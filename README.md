@@ -19,10 +19,10 @@ yarn build
 
 - [] See competitions of friends
 - [] Merge guests into friends
-- [] Only allow to merge if you own the guest profile
-- [] Only allow to create tracks with people who are friends
-- [X] Add simple statistics per game on dashboard
+- [x] Add simple statistics per game on dashboard
 - [X] Limit recent records to 3 on dashboard
 - [] Add "party" mode (keep same players selected when adding a track)
 - [] PWA features
-- [] Deploy Version
+- [x] Deploy Version (https://tracker.tippfehlr.de/)
+- [] Build Android
+- [] Build IOS
