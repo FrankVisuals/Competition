@@ -26,3 +26,7 @@ yarn build
 - [x] Deploy Version (https://tracker.tippfehlr.de/)
 - [] Build Android
 - [] Build IOS
+- [] Display tracks where you are not friends with people
+- [] Add button in competition dialogs to add new track
+- [] Verify Email process
+- [] Fallback to user alias if alias is left empty
