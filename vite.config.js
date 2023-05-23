@@ -13,9 +13,11 @@ export default defineConfig({
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
       manifest: {
         name: "Competition Tracker",
-        short_name: "Compi",
+        short_name: "CT",
         description: "All in one competition tracker",
         theme_color: "#ffffff",
+        background_color: "#ffffff",
+        display: "standalone",
         icons: [
           {
             src: "pwa-192x192.png",
@@ -26,8 +28,17 @@ export default defineConfig({
             src: "pwa-512x512.png",
             sizes: "512x512",
             type: "image/png"
+          },
+          {
+            src: "pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any maskable"
           }
         ]
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"]
       }
     })
   ],

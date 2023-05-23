@@ -22,6 +22,7 @@ const onLogout = async () => {
   router.push({ name: "login" })
 }
 
+/*
 const onDeleteAccount = async () => {
   bus.emit("delete", {
     title: "Delete Account",
@@ -33,6 +34,7 @@ const onDeleteAccount = async () => {
     }
   })
 }
+*/
 
 const onChangePassword = async () => {
   changepassworddialog.value.open()
