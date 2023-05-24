@@ -27,16 +27,22 @@ export const useFriendsStore = defineStore({
       }
     },
     selectableNonGuestFriends: (state) => {
-      return Object.entries(state.friends)
-        .filter(([, friend]) => {
-          return !friend.profiles.is_guest
-        })
-        .map(([id, friend]) => {
-          return {
-            key: id,
-            value: friend.alias
-          }
-        })
+      return [
+        {
+          key: null,
+          value: ""
+        },
+        ...Object.entries(state.friends)
+          .filter(([, friend]) => {
+            return !friend.profiles.is_guest
+          })
+          .map(([id, friend]) => {
+            return {
+              key: id,
+              value: friend.alias
+            }
+          })
+      ]
     },
     selectable: (state) => {
       return [
@@ -75,7 +81,8 @@ export const useFriendsStore = defineStore({
           friend_id,
           alias,
           profiles (
-            is_guest
+            is_guest,
+            user_id
           )
         `
         )
@@ -89,6 +96,13 @@ export const useFriendsStore = defineStore({
         acc[friend.id] = friend
         return acc
       }, {})
+    },
+    async getFriends() {
+      if (!this.friends.length) {
+        await this.refresh()
+      }
+
+      return this.friends
     },
     async find(email) {
       const { data, error } = await supabase
@@ -149,6 +163,10 @@ export const useFriendsStore = defineStore({
       }
 
       await this.refresh()
+    },
+    async transferGuestToFriend(friendId, fromProfileId, toProfileId) {
+      // TODO: this must become an edge function, as the results must be checked & changed in json
+      // Transactional handling required.
     },
     async delete(id) {
       const { error } = await supabase.from("friends").delete().eq("id", id)

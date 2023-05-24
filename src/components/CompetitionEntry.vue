@@ -18,7 +18,7 @@ const props = defineProps({
     </div>
     <div class="right">
       <span class="competition-yours" :class="{ yours: yours }">{{
-        props.yours ? "yours" : "member"
+        props.yours ? "yours" : "friends"
       }}</span>
     </div>
   </div>

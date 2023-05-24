@@ -22,8 +22,8 @@ watch(
   () => authStore.isUserLoaded,
   async (value) => {
     if (value) {
-      await competitionsStore.initialize()
       await friendsStore.initialize()
+      await competitionsStore.initialize()
       await tracksStore.initialize()
 
       allInitialized.value = true

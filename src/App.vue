@@ -3,6 +3,7 @@ import { onMounted } from "vue-demi"
 import { RouterView, useRouter } from "vue-router"
 import GlobalNotifications from "./fragments/GlobalNotifications.vue"
 import GlobalDeleteHandler from "./fragments/GlobalDeleteHandler.vue"
+import GlobalGenericModal from "./fragments/GlobalGenericModal.vue"
 import { useAuthStore } from "./stores/auth"
 
 const authStore = useAuthStore()
@@ -31,4 +32,5 @@ onMounted(async () => {
   <RouterView v-if="authStore.initialized" />
   <GlobalNotifications />
   <GlobalDeleteHandler />
+  <GlobalGenericModal />
 </template>

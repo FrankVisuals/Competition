@@ -10,11 +10,31 @@ import { useBusy } from "@/components/composables/busy"
 import { onMounted, reactive, ref, toRaw, watch } from "vue"
 import { useTracksStore } from "../stores/tracks"
 import { useCompetitionsStore } from "../stores/competitions"
+import bus from "../util/bus"
+import { useRouter } from "vue-router"
+
+const tracksStore = useTracksStore()
+const competitionsStore = useCompetitionsStore()
+const router = useRouter()
 
 const trackDialog = ref(null)
 
 const openTrackDialog = () => {
-  trackDialog.value.open()
+  if (!competitionsStore.competitions.length) {
+    bus.emit("confirm", {
+      title: "Missing Competitions",
+      message:
+        "You did not yet add any competition. You must first add a competition before you can add a track.",
+      button: "Go to Competitions",
+      callback: () => {
+        router.push({
+          name: "competitions"
+        })
+      }
+    })
+  } else {
+    trackDialog.value.open()
+  }
 }
 
 const viewTrackDialog = ref(null)
@@ -23,10 +43,8 @@ const openViewTrackDialog = (track) => {
   viewTrackDialog.value.open(track)
 }
 
-const tracksStore = useTracksStore()
-
 const busy = useBusy()
-const competitionsStore = useCompetitionsStore()
+
 const statistics = reactive({
   competitionId: null
 })
@@ -63,7 +81,13 @@ onMounted(async () => {
   <div class="view dashboard">
     <section class="recent">
       <span class="section-title">Recent Tracks</span>
-      <div class="tracks">
+      <div
+        class="tracks"
+        v-if="
+          tracksStore.recentTracks &&
+          Object.keys(tracksStore.recentTracks).length
+        "
+      >
         <TrackEntry
           v-for="(track, key) in tracksStore.recentTracks"
           :key="key"
@@ -71,6 +95,7 @@ onMounted(async () => {
           @click="openViewTrackDialog(track)"
         />
       </div>
+      <div class="no-data" v-else>No tracks yet.</div>
     </section>
 
     <section class="statistics">
@@ -90,6 +115,9 @@ onMounted(async () => {
           :key="id"
           :name="entry.alias"
           :score="entry.score"
+          :leader="
+            parseInt(Object.keys(tracksStore.statistics.entries)[0]) === id
+          "
         />
       </div>
 
@@ -106,6 +134,16 @@ onMounted(async () => {
 </template>
 
 <style lang="less" scoped>
+.dashboard {
+  padding-bottom: 5rem;
+}
+
+.no-data {
+  padding: 1rem;
+  text-align: center;
+  font-size: 12px;
+}
+
 .tracks {
   width: 100%;
 

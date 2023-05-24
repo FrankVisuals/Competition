@@ -36,16 +36,14 @@ const modelValue = useModelWrapper(props, emit, "modelValue")
   align-items: center;
   justify-content: center;
 
-  &::v-deep svg {
+  &:deep(svg) {
     opacity: 0.5;
     fill: var(--color-border);
   }
 
-  &.active::v-deep {
-    svg {
-      opacity: 1;
-      fill: #222;
-    }
+  &.active:deep(svg) {
+    opacity: 1;
+    fill: #222;
   }
 
   input {

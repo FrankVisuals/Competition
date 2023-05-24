@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 import { useAuthStore } from "./auth"
+import { useFriendsStore } from "./friends"
 import { supabase } from "../util/supabase"
 
 export const useCompetitionsStore = defineStore({
@@ -14,7 +15,8 @@ export const useCompetitionsStore = defineStore({
       user_id: null,
       members: []
     },
-    authStore: null
+    authStore: null,
+    friendsStore: null
   }),
   getters: {
     selectable(state) {
@@ -29,13 +31,21 @@ export const useCompetitionsStore = defineStore({
   actions: {
     async initialize() {
       this.authStore = useAuthStore()
+      this.friendsStore = useFriendsStore()
       return this.refresh()
     },
     async refresh() {
+      const friends = await this.friendsStore.getFriends()
+
       const { error, data } = await supabase
         .from("competitions")
         .select()
-        .eq("user_id", this.authStore.supabase.id)
+        .in("user_id", [
+          this.authStore.supabase.id,
+          ...Object.values(friends)
+            .filter((friend) => !!friend.profiles.user_id)
+            .map((friend) => friend.profiles.user_id)
+        ])
 
       if (error) {
         throw error

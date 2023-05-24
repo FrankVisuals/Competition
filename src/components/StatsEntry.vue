@@ -7,6 +7,10 @@ const props = defineProps({
   score: {
     type: Number,
     required: true
+  },
+  leader: {
+    type: Boolean,
+    default: false
   }
 })
 </script>
@@ -14,10 +18,10 @@ const props = defineProps({
 <template>
   <div class="component stats-entry">
     <div class="left">
-      <span class="stats-name">{{ props.name }}</span>
+      <span class="stats-name">{{ leader ? "👑 " : "" }}{{ props.name }}</span>
     </div>
     <div class="right">
-      <span class="date">{{ score }}</span>
+      <span class="date">{{ score }} 🔥</span>
     </div>
   </div>
 </template>

@@ -17,16 +17,17 @@ yarn build
 
 ## Todos
 
-- [] See competitions of friends
+- [X] See competitions of friends
 - [] Merge guests into friends
-- [x] Add simple statistics per game on dashboard
+- [X] Add simple statistics per game on dashboard
 - [X] Limit recent records to 3 on dashboard
 - [] Add "party" mode (keep same players selected when adding a track)
-- [] PWA features
-- [x] Deploy Version (https://tracker.tippfehlr.de/)
+- [X] PWA features
+- [X] Deploy Version (https://tracker.tippfehlr.de/)
 - [] Build Android
 - [] Build IOS
 - [] Display tracks where you are not friends with people
 - [] Add button in competition dialogs to add new track
 - [] Verify Email process
 - [] Fallback to user alias if alias is left empty
+- [] Login with Google

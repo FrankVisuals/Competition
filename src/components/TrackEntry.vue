@@ -1,6 +1,5 @@
 <script setup>
 import { computed } from "vue"
-import { useAuthStore } from "../stores/auth"
 import { useFriendsStore } from "../stores/friends"
 
 const props = defineProps({

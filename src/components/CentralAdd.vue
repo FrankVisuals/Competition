@@ -20,6 +20,7 @@ const emit = defineEmits(["click"])
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  z-index: 1;
 
   button {
     width: 50px;
@@ -28,6 +29,7 @@ const emit = defineEmits(["click"])
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    background: var(--color-background);
   }
 }
 </style>

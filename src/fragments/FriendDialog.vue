@@ -66,6 +66,16 @@ const onSave = async () => {
   }
 }
 
+const onTransfer = async () => {
+  await busy.load(async () => {
+    await friendsStore.transferGuestToFriend(
+      this.friend.id,
+      this.friend.profiles.id,
+      this.transferToUser.id
+    )
+  })
+}
+
 const addExistingFriend = async () => {
   const [user] = await friendsStore.find(friend.search)
 
@@ -184,8 +194,15 @@ const onDelete = async () => {
         >
           Delete
         </button>
-        <button :disabled="busy.isBusy" @click="onSave">
+        <button
+          :disabled="busy.isBusy"
+          @click="onSave"
+          v-if="!transferToUser.id"
+        >
           {{ friend.id ? "Update" : "Add" }}
+        </button>
+        <button :disabled="busy.isBusy" @click="onTransfer" v-else>
+          Transfer
         </button>
       </footer>
     </div>

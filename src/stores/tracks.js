@@ -34,7 +34,7 @@ export const useTracksStore = defineStore({
     async refresh() {
       const { data, error } = await supabase
         .from("tracks")
-        .select("competitions(id,name), *")
+        .select("competitions(*), *")
         .contains("results", `[{ "users": [${this.authStore.user.id}] }]`)
         .limit(3)
 
@@ -89,6 +89,10 @@ export const useTracksStore = defineStore({
       }
 
       await this.refresh()
+
+      if (`${this.statistics.competition_id}` === `${data.competition}`) {
+        await this.loadStatistics(this.statistics.competition_id)
+      }
     },
 
     async delete(id) {

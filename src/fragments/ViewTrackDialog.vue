@@ -13,6 +13,7 @@ import { useCompetitionsStore } from "../stores/competitions"
 import { useFriendsStore } from "../stores/friends"
 import { useTracksStore } from "../stores/tracks"
 import bus from "../util/bus"
+import { useAuthStore } from "../stores/auth"
 
 const dialog = useDialog()
 const busy = useBusy()
@@ -20,6 +21,7 @@ const busy = useBusy()
 const competitionsStore = useCompetitionsStore()
 const friendsStore = useFriendsStore()
 const tracksStore = useTracksStore()
+const authStore = useAuthStore()
 
 const track = reactive({
   id: null,
@@ -160,7 +162,11 @@ const onDelete = () => {
       </form>
 
       <footer>
-        <button :disabled="busy.isBusy" @click="onDelete" class="negative">
+        <button
+          :disabled="busy.isBusy || track.data.profile_id !== authStore.user.id"
+          @click="onDelete"
+          class="negative"
+        >
           Delete
         </button>
         <button :disabled="busy.isBusy" @click="dialog.close">Close</button>
